@@ -3,22 +3,26 @@ import type { Artist } from "@/lib/types";
 import { EmblaOptionsType } from "embla-carousel";
 import "../../styles/base.css";
 import "../../styles/embla.css";
+import { useRouter } from "next/router";
 
 type ArtistCard = {
     artist: Artist;
 };
 
 const ArtistCard: React.FC<ArtistCard> = ({ artist }) => {
+    const router = useRouter();
     const OPTIONS: EmblaOptionsType = {
         align: "start",
         dragFree: true,
         loop: true,
     };
+    const urlName = artist.name.replaceAll(" ", "-").toLowerCase();
 
     return (
                 <div
                     className="group relative flex bg-black w-[450px] h-[550px]"
                     key={artist.name}
+                    onClick={() => router.push(`/artist/${urlName}`)}
                 >
                     <img
                         alt={artist.name}
@@ -31,7 +35,7 @@ const ArtistCard: React.FC<ArtistCard> = ({ artist }) => {
                         </p>
                         <div className="mt-1">
                             <p className="text-sm text-white">
-                                Born: {artist.nationality}, birthday:{" "}
+                                {artist.nationality} | {" "}
                                 {artist.birthday}.
                             </p>
                         </div>

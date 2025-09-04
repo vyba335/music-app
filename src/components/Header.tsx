@@ -15,7 +15,7 @@ const Header = () => {
                     <div className="flex-1 md:flex md:items-center md:gap-12">
                         <a
                             className="block text-teal-600 dark:text-teal-300"
-                            href="#"
+                            href="/"
                             title="Go to homepage" 
                         >
                             <span className="sr-only">Home</span>

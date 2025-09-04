@@ -3,7 +3,8 @@ import React from "react";
 import Header from "@/src/components/Header";
 import Footer from "@/src/components/Footer";
 import { useRouter } from "next/router";
-import dataByName from "@/lib/dataHelper";
+import ArtistBanner from "@/src/components/ArtistBanner";
+import TrackList from "@/src/components/TrackList";
 
 interface ArtistProps {
     artist: Artist | null;
@@ -12,14 +13,21 @@ interface ArtistProps {
 
 const Artist: React.FC<ArtistProps> = ({ artist, error }) => {
     const router = useRouter();
-    
-    const validateAndFormatArtistName = (name: string | string[] | undefined): string | null => {
+    const [active, setActive] = React.useState(0);
+
+    const handleClick = (index: number) => {
+        setActive((prev) => index);
+    }
+
+    const validateAndFormatArtistName = (
+        name: string | string[] | undefined
+    ): string | null => {
         if (!name || typeof name !== "string") {
             return null;
         }
 
         const trimmedName = name.trim();
-        if(!trimmedName) {
+        if (!trimmedName) {
             return null;
         }
 
@@ -30,10 +38,10 @@ const Artist: React.FC<ArtistProps> = ({ artist, error }) => {
                 if (!word || word.length === 0) return "";
                 return word[0].toUpperCase() + word.slice(1).toLowerCase();
             })
-            .filter(word => word.length > 0)
+            .filter((word) => word.length > 0)
             .join(" ");
 
-            return formattedName || null;
+        return formattedName || null;
     };
 
     React.useEffect(() => {
@@ -42,7 +50,8 @@ const Artist: React.FC<ArtistProps> = ({ artist, error }) => {
         }
     }, [artist]);
 
-    const displayName = validateAndFormatArtistName(router.query.name) || "Unknown Artist";
+    const displayName =
+        validateAndFormatArtistName(router.query.name) || "Unknown Artist";
 
     if (!router.isReady) {
         return (
@@ -61,9 +70,7 @@ const Artist: React.FC<ArtistProps> = ({ artist, error }) => {
                 <div>
                     <h1>Error</h1>
                     <p>{error}</p>
-                    <button onClick={() => router.back()}>
-                        Go Back
-                    </button>
+                    <button onClick={() => router.back()}>Go Back</button>
                 </div>
                 <Footer />
             </>
@@ -77,9 +84,7 @@ const Artist: React.FC<ArtistProps> = ({ artist, error }) => {
                 <div>
                     <h1>Artist Not Found</h1>
                     <p>No information available for "{displayName}"</p>
-                    <button onClick={() => router.back()}>
-                        Go Back
-                    </button>
+                    <button onClick={() => router.back()}>Go Back</button>
                 </div>
                 <Footer />
             </>
@@ -90,10 +95,8 @@ const Artist: React.FC<ArtistProps> = ({ artist, error }) => {
         <>
             <Header />
             <main>
-                <h1>{displayName}</h1>
-                <div>
-                    {artist.name && <p>Name: {artist.name}</p>}
-                </div>
+                <ArtistBanner artist={artist} handleClick={handleClick} activeNumber={active} />
+                <TrackList album={artist.albums[active]} />   
             </main>
             <Footer />
         </>
@@ -102,7 +105,9 @@ const Artist: React.FC<ArtistProps> = ({ artist, error }) => {
 
 export default Artist;
 
-export async function getServerSideProps(context: { params: { name: string } }) {
+export async function getServerSideProps(context: {
+    params: { name: string };
+}) {
     try {
         const { name } = context.params;
 
@@ -110,8 +115,8 @@ export async function getServerSideProps(context: { params: { name: string } }) 
             return {
                 props: {
                     artist: null,
-                    error: "Invalid artist name"
-                }
+                    error: "Invalid artist name",
+                },
             };
         }
 
@@ -133,24 +138,24 @@ export async function getServerSideProps(context: { params: { name: string } }) 
             return {
                 props: {
                     artist: null,
-                    error: `No data found for artist: ${artistName}`
-                }
+                    error: `No data found for artist: ${artistName}`,
+                },
             };
         }
 
         return {
             props: {
                 artist: artistData,
-                error: null
-            }
+                error: null,
+            },
         };
     } catch (error) {
         console.error("Error in getServerSideProps", error);
         return {
             props: {
                 artist: null,
-                error: "An error occurred while fetching artist data"
-            }
+                error: "An error occurred while fetching artist data",
+            },
         };
     }
 }

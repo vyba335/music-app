@@ -43,6 +43,7 @@ const ArtistCard: React.FC<ArtistCard> = ({ artist }) => {
                             <EmblaCarousel
                                 slides={artist.albums}
                                 options={OPTIONS}
+                                isCard={true}
                             />
                         </section>
                     </div>

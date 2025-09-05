@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import musicAppIconGreen from "@/lib/img/musicappicongreen.png";
 import "@/styles/base.css";
 import SearchComponent from "./SearchComponent";
-import type { Song, Album, ArtistOid, ArtistResult, SongResult, AlbumResult, LyricsResult, SearchResult } from "@/lib/types";
+import type { SearchResult } from "@/lib/types";
 
 
 const Header = () => {

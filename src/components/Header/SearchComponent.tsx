@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import type { Song, Album, ArtistOid, ArtistResult, SongResult, AlbumResult, LyricsResult, SearchResult } from "@/lib/types";
+import type { Song, ArtistOid, ArtistResult, SongResult, AlbumResult, LyricsResult, SearchResult } from "@/lib/types";
 import { Search, Music, Album as LucideAlbum, User, Clock } from "lucide-react";
 
 interface SearchComponentProps {
@@ -255,7 +255,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                                     </span>
                                 </div>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    {result.artist.albums.length} album$
+                                    {result.artist.albums.length} album
                                     {result.artist.albums.length !== 1
                                         ? "s"
                                         : ""}
@@ -284,7 +284,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                             </p>
                             <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
                                 <div className="flex items-center space-x-1">
-                                    <Clock className="w-3 h-3" />¨
+                                    <Clock className="w-3 h-3" />
                                     <span>{result.song.length}</span>
                                 </div>
                                 <span>

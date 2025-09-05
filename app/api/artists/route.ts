@@ -1,16 +1,12 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import clientPromise from '@/lib/mongodb';
+import { NextRequest, NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
 import type { ArtistOid } from "@/lib/types";
 
 async function getArtists(): Promise<ArtistOid[]> {
     try {
         const client = await clientPromise;
         const db = client.db("musicapp");
-        const artists = await db
-            .collection("artists")
-            .find({})
-            .limit(10)
-            .toArray();
+        const artists = await db.collection("artists").find({}).toArray();
         return JSON.parse(JSON.stringify(artists));
     } catch (e) {
         console.error(e);
@@ -18,16 +14,15 @@ async function getArtists(): Promise<ArtistOid[]> {
     }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method === "GET") {
-        try {
-            const artists = await getArtists();
-            res.status(200).json(artists);
-        } catch (error) {
-            res.status(500).json({ error: "Failed to fetch artists "});
-        }
-    } else {
-        res.setHeader("Allow", ["GET"]);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+export async function GET(req: NextRequest) {
+    try {
+        const artists = await getArtists();
+        return NextResponse.json(artists);
+    } catch (error) {
+        console.error("API Error:", error);
+        return NextResponse.json(
+            { error: "Failed to fetch artists" },
+            { status: 500 }
+        );
     }
 }

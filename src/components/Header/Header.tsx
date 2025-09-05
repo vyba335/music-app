@@ -1,12 +1,41 @@
+"use client";
 import React from "react";
 import Image from "next/image";
-import musicAppIconGreen from "../../lib/img/musicappicongreen.png";
-import "../../styles/base.css";
-import Search from "./Search";
+import { useRouter } from "next/navigation";
+import musicAppIconGreen from "@/lib/img/musicappicongreen.png";
+import "@/styles/base.css";
+import SearchComponent from "./SearchComponent";
+import type { Song, Album, ArtistOid, ArtistResult, SongResult, AlbumResult, LyricsResult, SearchResult } from "@/lib/types";
 
-interface Header {}
 
 const Header = () => {
+    const router = useRouter();
+    
+    const handleSearchSelect = (result: SearchResult) => {
+        console.log("Search result selected:", result);
+
+        const artistSlug = result.artist.name
+            .toLowerCase()
+            .replace(/\s+/g, "-");
+
+        switch (result.type) {
+            case "artist":
+                router.push(`/artist/${artistSlug}`);
+                break;
+            case "song":
+                router.push(`/artist/${artistSlug}?album=${result.artist.albums.indexOf(result.album)}`);
+                break;
+            case "album":
+                router.push(`/artist/${artistSlug}?album=${result.artist.albums.indexOf(result.album)}`);
+                break;
+            case "lyrics":
+                router.push(`/artist/${artistSlug}?album=${result.artist.albums.indexOf(result.album)}`);
+                break;
+            default:
+                console.log("Unkown result type");
+        }
+    }
+
     return (
         <header className="custom-header">
             <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
@@ -47,7 +76,7 @@ const Header = () => {
                                     </a>
                                 </li>
                                 <li>
-                                    <Search />
+                                    <SearchComponent onSelect={handleSearchSelect} />
                                 </li>
                             </ul>
                         </nav>
@@ -76,11 +105,11 @@ const Header = () => {
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
-                                        stroke-width="2"
+                                        strokeWidth="2"
                                     >
                                         <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
                                             d="M4 6h16M4 12h16M4 18h16"
                                         />
                                     </svg>

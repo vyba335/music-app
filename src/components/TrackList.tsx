@@ -20,7 +20,7 @@ const TrackList: React.FC<TrackList> = ({ album }) => {
                 {album.title && <h1 className="text-5xl">{album.title}</h1>}
                 <ul>
                     {album.songs.map((song, index) => (
-                        <li key={song.title}>
+                        <li key={index}>
                             {index + 1}. {song.title} ({song.length})
                         </li>
                     ))}

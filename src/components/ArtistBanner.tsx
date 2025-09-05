@@ -4,13 +4,13 @@ import { EmblaOptionsType } from "embla-carousel";
 import "../../styles/base.css";
 import "../../styles/embla.css";
 
-type ArtistBanner = {
+type ArtistBannerProps = {
     artist: Artist;
-    handleClick?: any;
-    activeNumber: number;
+    handleClick: (index: number) => void;
+    activeAlbumIndex: number;
 };
 
-const ArtistBanner: React.FC<ArtistBanner> = ({ artist, handleClick, activeNumber }) => {
+const ArtistBanner: React.FC<ArtistBannerProps> = ({ artist, handleClick, activeAlbumIndex }) => {
     const OPTIONS: EmblaOptionsType = {
         align: "start",
         dragFree: true,
@@ -31,7 +31,7 @@ const ArtistBanner: React.FC<ArtistBanner> = ({ artist, handleClick, activeNumbe
                 {artist.name && <h1 className="text-5xl">{artist.name}</h1>}
             </div>
             <div className="col-span-3 col-start-2 row-start-2 artist-banner">
-                <EmblaCarousel slides={artist.albums} options={OPTIONS} handleClick={handleClick} activeNumber={activeNumber} />
+                <EmblaCarousel slides={artist.albums} options={OPTIONS} handleClick={handleClick} activeNumber={activeAlbumIndex} />
             </div>
         </div>
     );

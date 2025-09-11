@@ -8,11 +8,13 @@ html {
     font-family: Inter, "system-ui", -apple-system, BlinkMacSystemFont,
         "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
         "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: 0;
+    padding: 0;
 }
 *,
 *::before,
 *::after {
-    box-sizing: inherit;
+    box-sizing: border-box;
 }
 .theme-light {
     --brand-primary: rgb(47, 112, 193);
@@ -82,7 +84,8 @@ html {
     --admonition-warning-rgb-value: 253, 186, 116;
     --admonition-danger-rgb-value: 220, 38, 38;
 }
-.custom-header, .custom-footer {
+.custom-header,
+.custom-footer {
     background-color: #272932;
 }
 .login-button {
@@ -105,7 +108,8 @@ html {
     border-color: #95c623;
     caret-color: #95c623;
 }
-.search-element input, .search-element button:hover {
+.search-element input,
+.search-element button:hover {
     color: #95c623;
 }
 .copyright-block {

@@ -4,6 +4,7 @@ import React from "react";
 import ArtistBanner from "@/src/components/ArtistBanner";
 import TrackList from "@/src/components/TrackList";
 import { useRouter, useSearchParams } from "next/navigation";
+import AlbumCarousel from "../AlbumCarousel";
 
 interface ArtistClientProps {
     artist: Artist;
@@ -11,7 +12,7 @@ interface ArtistClientProps {
 }
 
 const ArtistClient: React.FC<ArtistClientProps> = ({ artist, artistName }) => {
-    const [activeAlbumIndex, setActiveAlbumIndex] = React.useState(0);
+    const [activeAlbumIndex, setActiveAlbumIndex] = React.useState<number | null>(null);
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -40,12 +41,13 @@ const ArtistClient: React.FC<ArtistClientProps> = ({ artist, artistName }) => {
 
     return (
         <>
-            <ArtistBanner
+            {/* <ArtistBanner
                 artist={artist}
                 handleClick={handleAlbumClick}
                 activeAlbumIndex={activeAlbumIndex}
             />
-            <TrackList album={artist.albums[activeAlbumIndex]} />
+            <TrackList album={artist.albums[activeAlbumIndex]} /> */}
+            <AlbumCarousel artistData={artist} activeAlbumIndex={activeAlbumIndex} />
         </>
     );
 };

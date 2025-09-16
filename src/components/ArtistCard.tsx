@@ -19,12 +19,6 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
         loop: true,
     };
 
-    const urlName = artist.name.replaceAll(" ", "-").toLowerCase();
-
-    const handleClick = () => {
-        router.push(`/artist/${urlName}`);
-    };
-
     const handleAlbumClick = (albumIndex: number) => {
         const artistSlug = artist.name
             .toLowerCase()

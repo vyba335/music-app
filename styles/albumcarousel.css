@@ -9,23 +9,6 @@
     }
 }
 
-@keyframes slideDown {
-    0% {
-        max-height: 0;
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    100% {
-        max-height: 300px;
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 .animate-flip-open {
     animation: flipOpen 0.6s ease-out forwards;
-}
-
-.animate-slide-down {
-    animation: slideDown 0.4s ease-out forwards;
 }

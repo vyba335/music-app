@@ -19,11 +19,11 @@ interface AlbumCarouselProps {
 }
 
 const ROTATION_SPEEDS = {
-    MOBILE: 0.15,
+    MOBILE: 0.35,
     DESKTOP: 0.25,
 } as const;
 
-const DRAG_SENSITIVITY = -0.5;
+const DRAG_SENSITIVITY = -1;
 const MIN_DRAG_DISTANCE = 5;
 
 const SPACING = {
@@ -43,7 +43,7 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
     artistData,
     activeAlbumIndex,
 }) => {
-    const [rotation, setRotation] = useState(0);
+    const [continuousPosition, setContinuousPosition] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [selectedAlbum, setSelectedAlbum] = useState<SelectedAlbum | null>(
@@ -90,11 +90,11 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
     // Auto-rotation
     useEffect(() => {
         const animate = () => {
-            if (!isHovered && !isDragging && !selectedAlbum) {
+            if (!isHovered && !isDragging && !selectedAlbum && albumCount > 0) {
                 const speed = isMobile
                     ? ROTATION_SPEEDS.MOBILE
                     : ROTATION_SPEEDS.DESKTOP;
-                setRotation((prev) => prev + speed);
+                setContinuousPosition((prev) => prev + speed);
             }
             animationRef.current = requestAnimationFrame(animate);
         };
@@ -105,7 +105,7 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
                 cancelAnimationFrame(animationRef.current);
             }
         };
-    }, [isHovered, isDragging, selectedAlbum, isMobile]);
+    }, [isHovered, isDragging, selectedAlbum, isMobile, albumCount]);
 
     // Mouse event handlers
 
@@ -116,7 +116,9 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
             const deltaX = e.clientX - dragStart.x;
             const deltaRotation = deltaX * DRAG_SENSITIVITY;
             setDragDistance(Math.abs(deltaX));
-            setRotation(dragStart.rotation + deltaRotation);
+
+            const newPosition = dragStart.rotation + deltaRotation;
+            setContinuousPosition(newPosition);
         },
         [isDragging, selectedAlbum, dragStart]
     );
@@ -140,7 +142,9 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
             const deltaX = e.touches[0].clientX - dragStart.x;
             const deltaRotation = deltaX * DRAG_SENSITIVITY;
             setDragDistance(Math.abs(deltaX));
-            setRotation(dragStart.rotation + deltaRotation);
+
+            const newPosition = dragStart.rotation + deltaRotation;
+            setContinuousPosition(newPosition);
         },
         [isDragging, selectedAlbum, dragStart]
     );
@@ -149,86 +153,63 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
 
     const handleMouseDown = useCallback(
         (e: React.MouseEvent) => {
-            console.log('Carousel mousedown detected');
             if (selectedAlbum) return;
-
-            const target = e.target as HTMLElement;
-            const albumElement = target.closest("[data-album]");
-            if (albumElement) {
-                console.log("Click on album element, not starting drag");
-                return;
-            }
 
             e.preventDefault();
             setIsDragging(true);
             setDragDistance(0);
-            setDragStart({
-                x: e.clientX,
-                rotation: rotation,
-                time: Date.now(),
+
+            setContinuousPosition((currentPos) => {
+                setDragStart({
+                    x: e.clientX,
+                    rotation: currentPos,
+                    time: Date.now(),
+                });
+                return currentPos;
             });
         },
-        [selectedAlbum, rotation]
+        [selectedAlbum]
     );
 
     // Touch handlers for mobile
     const handleTouchStart = useCallback(
         (e: React.TouchEvent) => {
-            console.log("Carousel touchstart detected");
             if (selectedAlbum || !e.touches[0]) return;
 
             const touch = e.touches[0];
             setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
+            setDragDistance(0);
+
+            setContinuousPosition((currentPos) => {
+                setDragStart({
+                    x: touch.clientX,
+                    rotation: currentPos,
+                    time: Date.now(),
+                });
+                return currentPos;
+            });
 
             setIsDragging(true);
-            setDragDistance(0);
-            setDragStart({
-                x: touch.clientX,
-                rotation: rotation,
-                time: Date.now(),
-            });
         },
-        [selectedAlbum, rotation]
+        [selectedAlbum]
     );
 
-    const handleTouchEnd = useCallback(
-        (e: React.TouchEvent) => {
-            if (isDragging) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            setIsDragging(false);
-            setTimeout(() => setDragDistance(0), 50);
-        },
-        [isDragging]
-    );
+    const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+        setIsDragging(false);
+        setTimeout(() => setDragDistance(0), 50);
+    }, []);
 
     // Album selection handler
     const handleAlbumClick = useCallback(
-        (album: Album, index: number, e: React.MouseEvent) => {
-            console.log(
-                "Album clicked:",
-                album.title,
-                "Drag distance:",
-                dragDistance,
-                "Is dragging:",
-                isDragging
-            );
-            if (dragDistance > MIN_DRAG_DISTANCE) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            if (isDragging) {
-                console.log("Click prevented - currently dragging");
-                return;
-            }
-
-            console.log("Setting selected album:", album.title);
+        (
+            album: Album,
+            index: number,
+            e: React.MouseEvent | React.TouchEvent
+        ) => {
             setSelectedAlbum({ ...album, index });
             setSelectedSong(null);
         },
-        [dragDistance, isDragging]
+        []
     );
 
     // Song selection handler
@@ -285,33 +266,39 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
         const containerEdge = isMobile
             ? DISTANCES.CONTAINER_EDGE_MOBILE
             : DISTANCES.CONTAINER_EDGE_DESKTOP;
-        const centerOffset = -rotation * 2;
 
-        return [...Array(3)].map((_, copyIndex) =>
-            albums.map((album: Album, index: number) => {
-                const totalIndex = copyIndex * albumCount + index;
-                const x = totalIndex * spacing + centerOffset;
-                const centerDistance = Math.abs(x);
+        const screenWidth =
+            typeof window !== "undefined" ? window.innerWidth : 1200;
+        const albumsNeeded = Math.ceil(screenWidth / spacing) + 6;
 
-                const centerOpacity = Math.max(
-                    0,
-                    1 - centerDistance / maxDistance
-                );
-                const edgeOpacity = Math.max(
-                    0,
-                    1 -
-                        Math.max(0, centerDistance - containerEdge) /
-                            DISTANCES.EDGE_FADE
-                );
-                const opacity = Math.min(centerOpacity, edgeOpacity);
-                const scale = Math.max(
-                    0.7,
-                    1 - centerDistance / (maxDistance * 2)
-                );
+        const baseAlbumIndex = Math.floor(continuousPosition / spacing);
+        const positionOffset = continuousPosition % spacing;
 
-                return (
+        const renderedAlbums = [];
+
+        for (let i = -3; i < albumsNeeded - 3; i++) {
+            const albumIndex = (baseAlbumIndex + i) % albumCount;
+            const normalizedAlbumIndex =
+                albumIndex < 0 ? albumIndex + albumCount : albumIndex;
+            const album = albums[normalizedAlbumIndex];
+
+            const x = i * spacing - positionOffset;
+            const centerDistance = Math.abs(x);
+
+            const centerOpacity = Math.max(0, 1 - centerDistance / maxDistance);
+            const edgeOpacity = Math.max(
+                0,
+                1 -
+                    Math.max(0, centerDistance - containerEdge) /
+                        DISTANCES.EDGE_FADE
+            );
+            const opacity = Math.min(centerOpacity, edgeOpacity);
+            const scale = Math.max(0.7, 1 - centerDistance / (maxDistance * 2));
+
+            if (opacity > 0.01) {
+                renderedAlbums.push(
                     <div
-                        key={`${copyIndex}-${index}`}
+                        key={`album-${normalizedAlbumIndex}`}
                         className="absolute cursor-pointer select-none flex flex-col items-center"
                         style={{
                             left: "50%",
@@ -322,88 +309,57 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
                             pointerEvents: opacity > 0.1 ? "auto" : "none",
                         }}
                         onClick={(e: React.MouseEvent) => {
-                            console.log(
-                                "Album div clicked! Album:",
-                                album.title,
-                                "opacity:",
-                                opacity
-                            );
                             e.stopPropagation();
-                            if (opacity > 0.1) {
-                                handleAlbumClick(album, index, e);
+                            const clickDuration =
+                                Date.now() - (dragStart.time || 0);
+                            const isQuickClick = clickDuration < 300;
+                            const isMinimalMovement =
+                                dragDistance <= MIN_DRAG_DISTANCE;
+
+                            if (
+                                isQuickClick &&
+                                isMinimalMovement &&
+                                opacity > 0.1
+                            ) {
+                                handleAlbumClick(
+                                    album,
+                                    normalizedAlbumIndex,
+                                    e
+                                );
                             }
                         }}
                         onMouseDown={(e: React.MouseEvent) => {
-                            console.log("Album mousedown:", album.title);
-                            e.stopPropagation();
+                            setDragDistance(0);
                         }}
                         onTouchStart={(e: React.TouchEvent) => {
-                            console.log('Album touchstart:', album.title);
                             if (e.touches[0]) {
+                                const touch = e.touches[0];
                                 setTouchStartPosition({
-                                    x: e.touches[0].clientX,
-                                    y: e.touches[0].clientY,
+                                    x: touch.clientX,
+                                    y: touch.clientY,
                                 });
-                                setDragDistance(0);
-                            }
-                        }}
-                        onTouchMove={(e: React.TouchEvent) => {
-                            if (e.touches[0]) {
-                                const deltaX = Math.abs(
-                                    e.touches[0].clientX - touchStartPosition.x
-                                );
-                                const deltaY = Math.abs(
-                                    e.touches[0].clientY - touchStartPosition.y
-                                );
-                                const totalDistance = Math.sqrt(
-                                    deltaX * deltaX + deltaY * deltaY
-                                );
-                                setDragDistance(totalDistance);
-                                console.log(
-                                    "Album touchmove distance:",
-                                    totalDistance
-                                );
                             }
                         }}
                         onTouchEnd={(e: React.TouchEvent) => {
-                            console.log(
-                                "Album touchend:",
-                                album.title,
-                                "drag distance:",
-                                dragDistance
-                            );
-                            e.stopPropagation();
-
                             const touchDuration =
                                 Date.now() - (dragStart.time || 0);
                             const isQuickTap = touchDuration < 300;
                             const isMinimalMovement =
                                 dragDistance <= MIN_DRAG_DISTANCE;
 
-                            console.log("Touch analysis:", {
-                                duration: touchDuration,
-                                distance: dragDistance,
-                                isQuickTap,
-                                isMinimalMovement,
-                                shouldOpen:
-                                    isQuickTap &&
-                                    isMinimalMovement &&
-                                    opacity > 0.1,
-                            });
-
                             if (
                                 isQuickTap &&
                                 isMinimalMovement &&
                                 opacity > 0.1
                             ) {
-                                const syntheticEvent = {
-                                    stopPropagation: () => {},
-                                    preventDefault: () => {},
-                                } as React.MouseEvent;
-                                handleAlbumClick(album, index, syntheticEvent);
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleAlbumClick(
+                                    album,
+                                    normalizedAlbumIndex,
+                                    e
+                                );
                             }
-
-                            setTimeout(() => setDragDistance(0), 100);
                         }}
                         onDragStart={(e: React.DragEvent) => e.preventDefault()}
                     >
@@ -431,16 +387,18 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
                         </div>
                     </div>
                 );
-            })
-        );
+            }
+        }
+
+        return renderedAlbums;
     }, [
         albums,
         albumCount,
-        rotation,
+        continuousPosition,
         isMobile,
         handleAlbumClick,
-        touchStartPosition,
         dragStart.time,
+        dragDistance,
     ]);
 
     if (!artistData) {
@@ -536,7 +494,13 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
                                 "https://placehold.co/400x400.png"
                             }
                             alt={`${selectedAlbum.title} album cover`}
-                            className="w-full h-48 object-cover"
+                            className={`w-full ${
+                                selectedSong &&
+                                selectedSong.lyrics !== "placeholder" &&
+                                selectedSong.lyrics !== "fě"
+                                    ? "h-24"
+                                    : "h-48"
+                            } object-cover`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                         <div className="absolute bottom-4 left-4 text-white">
@@ -564,7 +528,14 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
                     {/* Tracklist Section */}
                     <div
                         className="p-6 overflow-y-auto"
-                        style={{ maxHeight: selectedSong ? "200px" : "400px" }}
+                        style={{
+                            maxHeight:
+                                selectedSong &&
+                                selectedSong.lyrics !== "placeholder" &&
+                                selectedSong.lyrics !== "fě"
+                                    ? "140px"
+                                    : "280px",
+                        }}
                     >
                         <h3 className="font-semibold text-gray-900 mb-3">
                             Tracklist:
@@ -612,7 +583,7 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
 
                     {/* Lyrics Section (Hidden by default, shown when song selected) */}
                     {selectedSong && (
-                        <div className="border-t bg-gray-50 p-6 max-h-64 overflow-y-auto animate-slide-down">
+                        <div className="border-t bg-gray-50 p-6 max-h-100 overflow-y-auto drop-shadow-[0_35px_35px_rgba(0,0,0,0.55)]">
                             <div className="flex justify-between items-center mb-4">
                                 <h4 className="font-semibold text-gray-900">
                                     "{selectedSong.title}" Lyrics

@@ -83,7 +83,7 @@ const Header = () => {
                         <div className="flex items-center gap-4">
                             <div className="sm:flex sm:gap-4">
                                 <a
-                                    className="rounded-md login-button px-5 py-2.5 text-sm font-medium shadow-sm dark:hover:bg-teal-500"
+                                    className="rounded-md login-button bg-[#95c623] px-5 py-2.5 text-sm font-medium shadow-sm dark:hover:bg-teal-500"
                                     href="#"
                                 >
                                     Login

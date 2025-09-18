@@ -360,7 +360,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     return (
         <div ref={searchRef} className="relative w-full max-w-md">
             <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#95c623] w-5 h-5" />
                 <input
                     ref={inputRef}
                     type="text"
@@ -371,7 +371,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                     }}
                     onFocus={() => setIsOpen(true)}
                     placeholder="Search artists, songs, albums, or lyrics..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full pl-10 pr-4 py-2 border border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent outline-none caret-[#95c623] text-[#95c623]"
                     disabled={isLoading}
                     suppressHydrationWarning
                 />

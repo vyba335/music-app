@@ -115,3 +115,6 @@ html {
 .copyright-block {
     border-color: #95c623;
 }
+textarea:focus-visible {
+    outline: none;   
+}

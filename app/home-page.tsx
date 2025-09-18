@@ -4,6 +4,7 @@ import ArtistCard from "@/src/components/ArtistCard";
 import Header from "@/src/components/Header/Header";
 import Footer from "@/src/components/Footer";
 import HeroTitle from "@/src/components/HeroTitle";
+import AIRecommendations from "@/src/components/AIRecommendations";
 
 async function getArtists(): Promise<Artist[]> {
     try {
@@ -14,6 +15,9 @@ async function getArtists(): Promise<Artist[]> {
             .find({})
             .limit(10)
             .toArray();
+        const numberOfArtists = await db
+            .collection("artists")
+            .countDocuments();
         return JSON.parse(JSON.stringify(artists));
     } catch (e) {
         console.error(e);
@@ -21,16 +25,39 @@ async function getArtists(): Promise<Artist[]> {
     }
 }
 
+async function getArtistCount(): Promise<number> {
+    try {
+        const client = await clientPromise;
+        const db = client.db("musicapp");
+        const numberOfArtists = await db
+            .collection("artists")
+            .countDocuments();
+        return numberOfArtists;
+    } catch (e) {
+        console.error(e);
+        return 0;
+    }
+}
+
 export default async function Homepage() {
     const artists = await getArtists();
+    const numberOfArtists = await getArtistCount();
 
     return (
         <>
             <Header />
             <div>
                 <HeroTitle
+                    title="Discover Your Next Favorite Artist"
+                    subtitle={`AI-powered music recommendations from our collection of ${numberOfArtists} artists.`}
+                />
+                {/* AI Recommendations Section */}
+                <section className="max-w-4xl mx-auto px-5 py-8">
+                    <AIRecommendations />
+                </section>
+                <HeroTitle
                     title="Last added artists"
-                    subtitle={`For now it's only a sample of ${artists.length}. The limit will be 10.`}
+                    subtitle={`${artists.length} last added. ${numberOfArtists} total.`}
                 />
                 <section className="flex flex-wrap gap-2 justify-center p-5">
                     {artists.map((artist) => (

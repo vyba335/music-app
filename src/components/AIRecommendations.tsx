@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Sparkles, Music, Loader2 } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface Recommendation {
     artist: string;
@@ -69,17 +69,17 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
     };
 
     return (
-        <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
+        <div className={`bg-[#272932] rounded-lg shadow-lg p-6 ${className}`}>
             <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-purple-500" />
-                <h2 className="text-xl font-semibold text-gray-900">
+                <Sparkles className="w-5 h-5 text-[#95c623]" />
+                <h2 className="text-xl font-semibold text-white">
                     AI Music Recommendations
                 </h2>
             </div>
 
             <div className="space-y-4">
                 <div>
-                    <label htmlFor="preferences" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="preferences" className="block text-sm font-medium text-gray-200 mb-2">
                         What kind of music are you looking for?
                     </label>
                     <textarea
@@ -87,7 +87,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
                         value={preferences}
                         onChange={(e) => setPreferences(e.target.value)}
                         placeholder="E.g., 'I want something upbeat for working out' or 'relaxing acoustic music for studying'"
-                        className="w-full p-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                        className="w-full p-3 border text-white border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent resize-none"
                         rows={3}
                     />
                 </div>
@@ -95,7 +95,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
                 <button
                     onClick={handleGetRecommendations}
                     disabled={loading || !preferences.trim()}
-                    className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                    className="w-full bg-[#95c623] text-white px-4 py-2 rounded-lg hover:bg-[#5e7d16] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
                     >
                         {loading ? (
                             <>
@@ -124,17 +124,17 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
 
                     {recommendations.length > 0 && (
                         <div className="space-y-3">
-                            <h3 className="font-medium text-gray-900">Recommended Artists:</h3>
+                            <h3 className="font-medium text-white">Recommended Artists:</h3>
                             {recommendations.map((rec, index) => (
                                 <div
                                 key={index}
-                                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                className="border border-[#95c623] rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                                 onClick={() => handleArtistClick(rec.artist)}
                                 >
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
-                                            <Music className="w-4 h-4 text-purple-500" />
-                                            <span className="font-medium text-gray-900 hover:text-purple-600 transition-colors">
+                                            <Music className="w-4 h-4 text-[#95c623]" />
+                                            <span className="font-medium text-white hover:text-[#95c623] transition-colors">
                                                 {rec.artist}
                                             </span>
                                         </div>
@@ -142,7 +142,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
                                             {rec.confidence}% match
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-600">{rec.reason}</p>
+                                    <p className="text-sm text-gray-300">{rec.reason}</p>
                                 </div>
                             ))}
                         </div>

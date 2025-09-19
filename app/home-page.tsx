@@ -6,6 +6,7 @@ import Footer from "@/src/components/Footer";
 import HeroTitle from "@/src/components/HeroTitle";
 import AIRecommendations from "@/src/components/AIRecommendations";
 import MoodDiscovery from "@/src/components/MoodDiscovery";
+import ArtistComparison from "@/src/components/ArtistComparison";
 
 async function getArtists(): Promise<Artist[]> {
     try {
@@ -42,6 +43,7 @@ async function getArtistCount(): Promise<number> {
 
 export default async function Homepage() {
     const artists = await getArtists();
+    const artistNames = artists.map(artist => artist.name);
     const numberOfArtists = await getArtistCount();
 
     return (
@@ -61,6 +63,11 @@ export default async function Homepage() {
                 {/* Mood Discovery Section */ }
                 <section className="max-w-4xl mx-auto px-5 pb-8">
                     <MoodDiscovery />
+                </section>
+
+                {/* Artist Comparison Section */}
+                <section className="max-w-4xl mx-auto px-5 pb-8">
+                    <ArtistComparison availableArtists={artistNames} />
                 </section>
 
                 <HeroTitle

@@ -16,6 +16,23 @@ export interface RecommendationResponse {
     explanation: string;
 }
 
+export interface SmartSearchRequest {
+    query: string;
+    artists: Artist[];
+}
+
+export interface SmartSearchResult {
+    type: "artist" | "song" | "album" | "mood";
+    matches: any[];
+    interpretation: string;
+    filters: {
+        mood?: string;
+        genre?: string;
+        energy?: string;
+        year?: string;
+    };
+}
+
  export async function generateRecommendations(
     request: RecommendationRequest
  ): Promise<RecommendationResponse> {
@@ -128,5 +145,141 @@ export interface RecommendationResponse {
             energy: "medium",
             keywords: []
         };
+    }
+ }
+
+ export async function performSmartSearch(
+    request: SmartSearchRequest
+ ): Promise<SmartSearchResult> {
+    const prompt = `You are a smart music search assistant. Analyze this search query and find the best matches from the available music database.
+    
+    Search Query: "${request.query}"
+
+    Available Artists: ${request.artists.map(a => `${a.name} (${a.nationality}, ${a.albums.map(al => al.title).join(", ")})`).join("; ")}
+
+    Your task:
+    1. Interpret what the user is looking for
+    2. Identify any mood, genre, energy level, or time period mentioned
+    3. Find the best matches from available artists/albums/songs
+    4. Explain your interpretation
+
+    Examples of queries you should handle:
+    - "sad indie songs from 2000s" → Look for melancholic indie tracks from that era
+    - "upbeat pop for working out" → High energy pop songs
+    - "music like Ed Sheeran but more rock" → Artists similar to Ed Sheeran with rock elements
+    - "relaxing acoustic guitar music" → Acoustic, mellow tracks
+
+    Respond in JSON format:
+    {
+        "type": "artist|song|album|mood",
+        "matches": [
+            {
+                "name": "Match Name",
+                "type": "artist|song|album",
+                "reason": "Why this matches",
+                "confidence": 90
+            }
+        ],
+        "interpretation": "What you understood from the query",
+        "filters": {
+            "mood": "detected mood",
+            "genre": "detected genre",
+            "energy": "low|medium|high",
+            "year": "detected time period"
+        }
+    }`;
+
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a music search expert. Always respond with valid JSON. Only suggest items from the provided database."
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+            temperature: 0.5,
+            max_tokens: 1000,
+        });
+
+        const response = completion.choices[0]?.message?.content;
+        if (!response) {
+            throw new Error("No response from OpenAI");
+        }
+
+        return JSON.parse(response);
+    } catch (error) {
+        console.error("Smart search error:", error);
+        throw new Error("Failed to perform smart search");
+    }
+ }
+
+ export async function generateMoodRecommendations(
+    mood:string,
+    artists: Artist[]
+ ): Promise<{
+    recommendations: Array<{
+        artist: string;
+        album?: string;
+        songs?: string[];
+        reason: string;
+    }>;
+    moodAnalysis: string;
+ }> {
+    const prompt = `You are a mood-based music recommendation expert. Based on the user's mood and available music, suggest the best matches.
+    
+    Current User Mood: ${mood}
+
+    Available Artists: ${artists.map(a => `${a.name} - Albums: ${a.albums.map(al => `"${al.title}" (${al.released})`).join(", ")}`).join("; ")}
+
+    Provide recommendations that match this mood. Consider:
+    - Song titles that suggest certain emotions
+    - Artist styles that fit the mood
+    - Album themes and release periods
+    - Musical genres that typically evoke this mood
+
+    Respond in JSON format:
+    {
+        "recommendations": [
+            {
+                "artist": "Artist Name",
+                "album": "Album Name (if specific album fits best)",
+                "songs": ["Song1", "Song2"] (if specific songs mentioned),
+                "reason": "Why this fits the mood"
+            }
+        ],
+        "moodAnalysis": "Brief analysis of the mood and why these recommendations work"
+    }`;
+
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a music mood expert. Always respond with valid JSON."
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+            temperature: 0.6,
+            max_tokens: 800,
+        });
+
+        const response = completion.choices[0]?.message?.content;
+        if (!response) {
+            throw new Error("No response from OpenAI");
+        }
+
+        return JSON.parse(response);
+    } catch (error) {
+        console.error("Mood recommendation error:", error);
+        throw new Error("Failed to generate mood recommendations");
     }
  }

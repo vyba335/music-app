@@ -1,20 +1,46 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import type { Song, ArtistOid, ArtistResult, SongResult, AlbumResult, LyricsResult, SearchResult } from "@/lib/types";
-import { Search, Music, Album as LucideAlbum, User, Clock } from "lucide-react";
+import type {
+    Song,
+    ArtistOid,
+    ArtistResult,
+    SongResult,
+    AlbumResult,
+    LyricsResult,
+    SearchResult,
+} from "@/lib/types";
+import {
+    Search,
+    Music,
+    Album as LucideAlbum,
+    User,
+    Clock,
+    Sparkles,
+    Brain,
+} from "lucide-react";
 
 interface SearchComponentProps {
     onSelect?: (result: SearchResult) => void;
 }
 
+interface SmartSearchResult {
+    name: string;
+    type: "artist" | "song" | "album";
+    reason: string;
+    confidence: number;
+}
+
 const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
+    const [smartResults, setSmartResults] = useState<SmartSearchResult[]>([]);
+    const [interpretation, setInterpretation] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [artists, setArtists] = useState<ArtistOid[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [useAI, setUseAI] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -102,8 +128,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                         const cleanedLyrics = song.lyrics
                             .replace(/\\"/g, '"')
                             .replace(/\\'/g, "'")
-                            .replace(/\\\\/g, '\\')
-                            .replace(/\\n/g, '\n');
+                            .replace(/\\\\/g, "\\")
+                            .replace(/\\n/g, "\n");
 
                         const lowerLyrics = cleanedLyrics.toLowerCase();
                         const lowerQuery = searchQuery.toLowerCase();
@@ -120,7 +146,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                                 end
                             );
 
-                            matchedText = matchedText.replace(/\n+/g, ' ').trim();
+                            matchedText = matchedText
+                                .replace(/\n+/g, " ")
+                                .trim();
 
                             lyricsResults.push({
                                 type: "lyrics",
@@ -141,7 +169,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
         return lyricsResults;
     };
 
-    const performSearch = (searchQuery: string): SearchResult[] => {
+    const performRegularSearch = (searchQuery: string): SearchResult[] => {
         if (searchQuery.length < 2) return [];
 
         const artistResults = searchArtists(searchQuery);
@@ -157,37 +185,73 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
         ];
     };
 
+    const performAISearch = async (searchQuery: string) => {
+        if (searchQuery.length < 5) return;
+
+        setIsLoading(true);
+        try {
+            const response = await fetch("/api/ai/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: searchQuery }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setSmartResults(data.results || []);
+                setInterpretation(data.interpretation || "");
+            }
+        } catch (error) {
+            console.error("AI search error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            const searchResults = performSearch(query);
-            setResults(searchResults);
+            if (useAI && query.length >= 5) {
+                performAISearch(query);
+                setResults([]);
+            } else {
+                const searchResults = performRegularSearch(query);
+                setResults(searchResults);
+                setSmartResults([]);
+                setInterpretation("");
+            }
             setSelectedIndex(-1);
-        }, 150);
+        }, 300);
 
         return () => clearTimeout(timeoutId);
-    }, [query]);
+    }, [query, useAI]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (!isOpen) return;
 
+            const totalResults = useAI ? smartResults.length : results.length;
+
             switch (e.key) {
                 case "ArrowDown":
                     e.preventDefault();
                     setSelectedIndex((prev) =>
-                        prev < results.length - 1 ? prev + 1 : 0
+                        prev < totalResults - 1 ? prev + 1 : 0
                     );
                     break;
                 case "ArrowUp":
                     e.preventDefault();
                     setSelectedIndex((prev) =>
-                        prev > 0 ? prev - 1 : results.length - 1
+                        prev > 0 ? prev - 1 : totalResults - 1
                     );
                     break;
                 case "Enter":
                     e.preventDefault();
-                    if (selectedIndex >= 0 && results[selectedIndex]) {
-                        handleSelect(results[selectedIndex]);
+                    if (selectedIndex >= 0) {
+                        if (useAI && smartResults[selectedIndex]) {
+                            handleSmartResultClick(smartResults[selectedIndex]);
+                        } else if (!useAI && results[selectedIndex]) {
+                            handleSelect(results[selectedIndex]);
+                        }
                     }
                     break;
                 case "Escape":
@@ -199,7 +263,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
 
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isOpen, selectedIndex, results]);
+    }, [isOpen, selectedIndex, results, smartResults, useAI]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -219,8 +283,54 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     const handleSelect = (result: SearchResult) => {
         setIsOpen(false);
         setQuery("");
-        onSelect?.(result)
-        console.log("Selected:", result);
+        onSelect?.(result);
+    };
+
+    const handleSmartResultClick = (result: SmartSearchResult) => {
+        // Find the actual artist/album/song in your data
+        let artist: ArtistResult | null = null;
+        let album: AlbumResult | null = null;
+        let song: SongResult | null = null;
+        
+        for (const artistObj of artists) {
+            // Check if it's an artist name match
+            if (artistObj.name === result.name) {
+                artist = {type: "artist", artist: artistObj};
+                break;
+            }
+
+            // Check albums and songs within this artist
+            for (const albumObj of artistObj.albums) {
+                // Check if it's an album title match
+                if (albumObj.title === result.name) {
+                    album = { type: "album", artist: artistObj, album: albumObj };
+                    break;
+                }
+
+                // Check if it's a song title match
+                const foundSong = albumObj.songs.find(
+                    (songObj) => songObj.title === result.name
+                );
+                if (foundSong) {
+                    song = {
+                        type: "song",
+                        artist: artistObj,
+                        album: albumObj,
+                        song: foundSong,
+                    };
+                    break;
+                }
+            }
+
+            // Break out of outer loop if we found a match
+            if (album || song) break;
+        }
+
+        const typeMap = { artist, album, song };
+        const item = typeMap[result.type as keyof typeof typeMap];
+        if (item) {
+            handleSelect(item as SearchResult);
+        }
     };
 
     const hasLyrics = (song: Song): boolean => {
@@ -230,7 +340,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     const renderResult = (result: SearchResult, index: number) => {
         const isSelected = index === selectedIndex;
         const baseClasses = `px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 ${
-            isSelected ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-gray-50 dark:hover:bg-gray-800"
+            isSelected
+                ? "bg-blue-50 dark:bg-blue-900/20"
+                : "hover:bg-gray-50 dark:hover:bg-gray-800"
         }`;
 
         switch (result.type) {
@@ -288,7 +400,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                                     <span>{result.song.length}</span>
                                 </div>
                                 <span>
-                                    Lyrics: {hasLyrics(result.song) ? "Yes" : "No"}
+                                    Lyrics:{" "}
+                                    {hasLyrics(result.song) ? "Yes" : "No"}
                                 </span>
                             </div>
                         </div>
@@ -312,14 +425,21 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                             <div className="flex-1 space-y-1">
                                 <div className="flex items-center space-x-2">
                                     <LucideAlbum className="w-4 h-4 text-purple-500" />
-                                    <span className="font-medium text-gray-900 dark:text-white">{result.album.title}</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">
+                                        {result.album.title}
+                                    </span>
                                 </div>
-                                <p className="text-sm text-gray-600 dark:text-gray-300">by {result.artist.name}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    by {result.artist.name}
+                                </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {result.album.songs.length} songs • {result.album.released}
+                                    {result.album.songs.length} songs •{" "}
+                                    {result.album.released}
                                 </p>
                                 <p className="text-xs text-gray-500  dark:text-gray-400">
-                                    {firstThreeSongs.map(song => song.title).join(", ")}
+                                    {firstThreeSongs
+                                        .map((song) => song.title)
+                                        .join(", ")}
                                     {result.album.songs.length > 3 && "..."}
                                 </p>
                             </div>
@@ -330,14 +450,16 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             case "lyrics":
                 return (
                     <div
-                    key={`lyrics-${result.artist._id.$oid}-${result.album.title}-${result.song.title}`}
-                    className={baseClasses}
-                    onClick={() => handleSelect(result)}
+                        key={`lyrics-${result.artist._id.$oid}-${result.album.title}-${result.song.title}`}
+                        className={baseClasses}
+                        onClick={() => handleSelect(result)}
                     >
                         <div className="space-y-1">
                             <div className="flex items-center space-x-2">
                                 <Search className="w-4 h-4 text-orange-500" />
-                                <span className="font-medium text-gray-900 dark:text-white">{result.song.title}</span>
+                                <span className="font-medium text-gray-900 dark:text-white">
+                                    {result.song.title}
+                                </span>
                                 <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded dark:bg-orange-900/50 dark:text-orange-400">
                                     Lyrics match
                                 </span>
@@ -357,6 +479,31 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
         }
     };
 
+    const renderSmartResult = (result: SmartSearchResult, index: number) => {
+        const isSelected = index === selectedIndex;
+        const baseClasses = `px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 ${isSelected ? "bg-purple-50" : "hover:bg-purple-25"}`;
+
+        return (
+            <div key={`smart-${index}`} className={baseClasses} onClick={() => handleSmartResultClick(result)}>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <Brain className="w-4 h-4 text-purple-500" />
+                        <div>
+                            <span className="font-medium text-gray-900">{result.name}</span>
+                            <span className="ml-2 text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">
+                                {result.type}
+                            </span>
+                            <p className="text-sm text-gray-600 mt-1">{result.reason}</p>
+                        </div>
+                    </div>
+                    <span className="text-xs text-purple-600 font-medium">
+                        {result.confidence}% match
+                    </span>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div ref={searchRef} className="relative w-full max-w-md">
             <div className="relative">
@@ -370,11 +517,18 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                         setIsOpen(true);
                     }}
                     onFocus={() => setIsOpen(true)}
-                    placeholder="Search artists, songs, albums, or lyrics..."
-                    className="w-full pl-10 pr-4 py-2 border border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent outline-none caret-[#95c623] text-[#95c623]"
+                    placeholder={useAI ? "Try: 'upbeat songs for working out'" : "Search artists, songs, albums, lyrics..."}
+                    className="w-full pl-10 pr-4 py-2 border border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent outline-none caret-[#95c623] text-white"
                     disabled={isLoading}
                     suppressHydrationWarning
                 />
+                <button 
+                    onClick={() => setUseAI(!useAI)}
+                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded ${useAI ? "text-purple-500" : "text-gray-400"} hover:text-purple-600 transition-colors`}
+                    title={useAI ? "Switch to regular search" : "Switch to AI search"}
+                    >
+                        <Sparkles className="w-4 h-4" />
+                </button>
                 {isLoading && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
@@ -384,19 +538,40 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
 
             {isOpen && query.length >= 2 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
-                    {results.length > 0 ? (
-                        <div>
-                            {results.map((result, index) => renderResult(result, index))}
+                    {useAI && interpretation && (
+                        <div className="px-4 py-2 bg-purple-50 border-b border-purple-100 ">
+                            <p className="text-sm text-purple-700">
+                                <Sparkles className="w-3 h-3 inline mr-1" />
+                                AI understands: {interpretation}
+                            </p>
                         </div>
+                    )}
+
+                    {useAI ? (
+                        smartResults.length > 0 ? (
+                            <div>
+                                {smartResults.map((result, index) => renderSmartResult(result, index))}
+                            </div>
+                        ) : query.length >= 5 && !isLoading ? (
+                            <div className="px-4 py-3 text-gray-500 text-center text-sm">
+                                No AI results found for "{query}"
+                            </div>
+                        ) : null
                     ) : (
-                        <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
-                            No results found for "{query}"
-                        </div>
+                        results.length > 0 ? (
+                            <div>
+                                {results.map((result, index) => renderResult(result, index))}
+                            </div>
+                        ) : (
+                            <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
+                                No results found for "{query}"
+                            </div>
+                        )
                     )}
                 </div>
             )}
         </div>
-    )
+    );
 };
 
 export default SearchComponent;

@@ -87,8 +87,9 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
                         value={preferences}
                         onChange={(e) => setPreferences(e.target.value)}
                         placeholder="E.g., 'I want something upbeat for working out' or 'relaxing acoustic music for studying'"
-                        className="w-full p-3 border text-white border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent resize-none"
+                        className="w-full p-3 border text-white caret-[#95c623] border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent resize-none"
                         rows={3}
+                        suppressHydrationWarning
                     />
                 </div>
 

@@ -5,6 +5,7 @@ import Header from "@/src/components/Header/Header";
 import Footer from "@/src/components/Footer";
 import HeroTitle from "@/src/components/HeroTitle";
 import AIRecommendations from "@/src/components/AIRecommendations";
+import MoodDiscovery from "@/src/components/MoodDiscovery";
 
 async function getArtists(): Promise<Artist[]> {
     try {
@@ -49,15 +50,22 @@ export default async function Homepage() {
             <div>
                 <HeroTitle
                     title="Discover Your Next Favorite Artist"
-                    subtitle={`AI-powered music recommendations from our collection of ${numberOfArtists} artists.`}
+                    subtitle={`AI-powered music recommendations and mood-based discovery from our collection of ${numberOfArtists} artists.`}
                 />
+
                 {/* AI Recommendations Section */}
                 <section className="max-w-4xl mx-auto px-5 py-8">
-                    <AIRecommendations />
+                    <AIRecommendations className="mb-8" />
                 </section>
+
+                {/* Mood Discovery Section */ }
+                <section className="max-w-4xl mx-auto px-5 pb-8">
+                    <MoodDiscovery />
+                </section>
+
                 <HeroTitle
-                    title="Last added artists"
-                    subtitle={`${artists.length} last added. ${numberOfArtists} total.`}
+                    title="Featured Artists"
+                    subtitle={`Explore our curated collection. ${numberOfArtists} currently in db`}
                 />
                 <section className="flex flex-wrap gap-2 justify-center p-5">
                     {artists.map((artist) => (

@@ -18,6 +18,7 @@ import {
     Clock,
     Sparkles,
     Brain,
+    Check
 } from "lucide-react";
 
 interface SearchComponentProps {
@@ -220,7 +221,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                 setInterpretation("");
             }
             setSelectedIndex(-1);
-        }, 300);
+        }, 1200);
 
         return () => clearTimeout(timeoutId);
     }, [query, useAI]);
@@ -487,16 +488,16 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             <div key={`smart-${index}`} className={baseClasses} onClick={() => handleSmartResultClick(result)}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <Brain className="w-4 h-4 text-purple-500" />
+                        <Brain className="w-6 h-6 text-[#95c623]" />
                         <div>
-                            <span className="font-medium text-gray-900">{result.name}</span>
-                            <span className="ml-2 text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">
+                            <span className="font-medium text-[#95c623] hover:text-white">{result.name}</span>
+                            <span className="ml-2 text-xs text-gray-400 px-2 border rounded">
                                 {result.type}
                             </span>
-                            <p className="text-sm text-gray-600 mt-1">{result.reason}</p>
+                            <p className="text-sm text-gray-400 mt-1">{result.reason}</p>
                         </div>
                     </div>
-                    <span className="text-xs text-purple-600 font-medium">
+                    <span className="text-xs text-[#95c623] font-medium">
                         {result.confidence}% match
                     </span>
                 </div>
@@ -505,7 +506,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     };
 
     return (
-        <div ref={searchRef} className="relative w-full max-w-md">
+        <div ref={searchRef} className="flex-1 relative w-full max-w-3xl">
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#95c623] w-5 h-5" />
                 <input
@@ -524,14 +525,18 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                 />
                 <button 
                     onClick={() => setUseAI(!useAI)}
-                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded ${useAI ? "text-purple-500" : "text-gray-400"} hover:text-purple-600 transition-colors`}
+                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded ${useAI ? "text-[#5e7d16]" : "text-[#95c623]"} hover:bg-[#5e7d16] transition-colors`}
                     title={useAI ? "Switch to regular search" : "Switch to AI search"}
                     >
-                        <Sparkles className="w-4 h-4" />
+                       {useAI ? (
+                        <Check className="w-6 h-6" />
+                       ) : (
+                        <Sparkles className="w-6 h-6" />
+                       )}
                 </button>
                 {isLoading && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500"></div>
                     </div>
                 )}
             </div>
@@ -539,8 +544,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             {isOpen && query.length >= 2 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
                     {useAI && interpretation && (
-                        <div className="px-4 py-2 bg-purple-50 border-b border-purple-100 ">
-                            <p className="text-sm text-purple-700">
+                        <div className="px-4 py-2 bg-[#272932] border-b border-purple-100 ">
+                            <p className="text-sm text-gray-300">
                                 <Sparkles className="w-3 h-3 inline mr-1" />
                                 AI understands: {interpretation}
                             </p>

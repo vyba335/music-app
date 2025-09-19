@@ -3,7 +3,7 @@ import { generateMoodRecommendations } from "@/lib/ai-services";
 import clientPromise from "@/lib/mongodb"
 import type { Artist } from "@/lib/types";
 
-export async function POST(request: NextRequest) {
+/* export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const { mood } = body;
@@ -43,6 +43,65 @@ export async function POST(request: NextRequest) {
             { status: 500 }
         );
     }
+} */
+
+export async function POST(request: NextRequest) {
+  try {
+    console.log('Mood API called');
+    
+    const body = await request.json();
+    console.log('Request body:', body);
+    
+    const { mood } = body;
+
+    if (!mood || typeof mood !== 'string') {
+      console.log('Invalid mood:', mood);
+      return NextResponse.json(
+        { error: 'Mood is required' },
+        { status: 400 }
+      );
+    }
+
+    console.log('Getting artists from database...');
+    
+    // Get artists from database
+    const client = await clientPromise;
+    const db = client.db('musicapp');
+    const artists = await db
+      .collection('artists')
+      .find({})
+      .toArray();
+
+    console.log('Found artists:', artists.length);
+
+    const artistsTyped: Artist[] = JSON.parse(JSON.stringify(artists));
+
+    console.log('Calling generateMoodRecommendations...');
+    
+    // Generate mood-based recommendations
+    const moodResults = await generateMoodRecommendations(mood, artistsTyped);
+
+    console.log('Mood results:', moodResults);
+
+    return NextResponse.json({
+      recommendations: moodResults.recommendations,
+      moodAnalysis: moodResults.moodAnalysis,
+      mood,
+    });
+
+  } catch (error) {
+    console.error('Mood recommendation API error:', error);
+    
+    // Return more detailed error info for debugging
+    return NextResponse.json(
+      { 
+        error: 'Failed to generate mood recommendations',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export async function GET() {

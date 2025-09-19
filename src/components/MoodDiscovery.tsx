@@ -35,7 +35,9 @@ const MoodDiscovery: React.FC = () => {
         try {
             const response = await fetch("/api/ai/mood", {
                 method: "POST",
-                headers: { "Content-Type": "application/json"},
+                headers: { 
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ mood: mood.toLowerCase() }),
             });
 
@@ -63,10 +65,10 @@ const MoodDiscovery: React.FC = () => {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-[#272932] rounded-lg shadow-lg p-6">
             <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Discover Music by Mood</h2>
-                <p className="text-gray-600">How are you feeling today? Let AI find the perfect music for your mood.</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Discover Music by Mood</h2>
+                <p className="text-gray-200">How are you feeling today? Let AI find the perfect music for your mood.</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -77,14 +79,14 @@ const MoodDiscovery: React.FC = () => {
                         key={mood.name}
                         onClick={() => handleMoodSelect(mood.name)}
                         disabled={loading}
-                        className={`p-4 rounded-lg border-2 transition-all hover:shadow-md disabled:opacity-50 ${selectedMood === mood.name ? "border-purple-500 bg-purple-50" : "border-gray-200 hover:border-gray-300"}`}
+                        className={`p-4 rounded-lg border-2 transition-all hover:shadow-md disabled:opacity-50 ${selectedMood === mood.name ? "border-purple-500 bg-purple-50" : "border-[#95c623] hover:border-gray-300"}`}
                         >
                             <div className="flex flex-col items-center space-y-2">
                                 <div className={`p-2 rounded-full ${mood.color}`}>
                                     <IconComponent className="w-6 h-6" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="font-medium text-gray-900">{mood.name}</h3>
+                                    <h3 className={`font-medium text-shad ${selectedMood === mood.name ? "text-gray-800" : "text-[#95c623]"} `}>{mood.name}</h3>
                                     <p className="text-xs text-gray-500">{mood.description}</p>
                                 </div>
                             </div>
@@ -95,7 +97,7 @@ const MoodDiscovery: React.FC = () => {
 
             {loading && (
                 <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#95c623]" />
                     <span className="ml-2 text-gray-600">Finding the perfect music for your mood...</span>
                 </div>
             )}
@@ -115,28 +117,28 @@ const MoodDiscovery: React.FC = () => {
 
             {recommendations.length > 0 && (
                 <div className="space-y-4">
-                    <h3 className="font-semibold text-gray-900">Perfect Matches for Your Mood:</h3>
+                    <h3 className="font-semibold text-white">Perfect Matches for Your Mood:</h3>
                     {recommendations.map((rec, index) => (
                         <div
                         key={index}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                        className="border border-[#95c623] rounded-lg p-4 hover:shadow-md transition-shadow"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                    <h4 className="font-medium text-gray-900 hover:text-purple-600 cursor-pointer transition-colors" onClick={() => handleArtistClick(rec.artist)}>
+                                    <h4 className="font-semibold text-lg text-white hover:text-[#95c623] cursor-pointer transition-colors" onClick={() => handleArtistClick(rec.artist)}>
                                         {rec.artist}
                                     </h4>
                                     {rec.album && (
-                                        <p className="text-sm text-gray-600 mt-1">Album: {rec.album}</p>
+                                        <p className="text-sm text-gray-200 mt-1"><span className="text-[#95c623]">Album:</span> {rec.album}</p>
                                     )}
                                     {rec.songs && rec.songs.length > 0 && (
-                                        <p className="text-sm text-gray-600 mt-1">
-                                            Featured songs: {rec.songs.join(", ")}
+                                        <p className="text-sm text-gray-200 mt-1">
+                                            <span className="text-[#95c623]">Featured songs:</span> {rec.songs.join(", ")}
                                         </p>
                                     )}
-                                    <p className="text-sm text-gray-700 mt-2">{rec.reason}</p>
+                                    <p className="text-sm text-gray-300 mt-2">{rec.reason}</p>
                                 </div>
-                                <Music2 className="w-5 h-5 text-purple-400 ml-4 flex-shrink-0" />
+                                <Music2 className="w-5 h-5 text-[#95c623] ml-4 flex-shrink-0" />
                             </div>
                         </div>
                     ))}

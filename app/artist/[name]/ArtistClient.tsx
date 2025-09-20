@@ -3,6 +3,7 @@ import type { Artist } from "@/lib/types";
 import React, { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import ArtistInsights from "@/src/components/ArtistInsights";
+import MusicChatBot from "@/src/components/MusicChatBot";
 import { useRouter, useSearchParams } from "next/navigation";
 import AlbumCarousel from "../AlbumCarousel";
 
@@ -96,6 +97,9 @@ const ArtistClient: React.FC<ArtistClientProps> = ({ artist, artistName }) => {
                 artistData={artist}
                 activeAlbumIndex={activeAlbumIndex}
             />
+
+            {/* AI Chat Assistant */}
+            <MusicChatBot />
         </div>
     );
 };

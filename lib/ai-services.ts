@@ -1,5 +1,5 @@
 import { openai } from "./openai";
-import type { Artist } from "./types";
+import type { Artist, ChatContext, ChatResponse, ArtistInsight, SongAnalysis, SmartSearchRequest, SmartSearchResult, RecommendationRequest, RecommendationResponse } from "./types";
 
 // Helper function to clean JSON responses from OpenAI
 function cleanJsonResponse(response: string): string {
@@ -9,21 +9,6 @@ function cleanJsonResponse(response: string): string {
     cleaned = cleaned.trim();
 
     return cleaned;
-}
-
-export interface RecommendationRequest {
-    preferences: string;
-    mood?: string;
-    artists?: Artist[];
-}
-
-export interface RecommendationResponse {
-    recommendations: {
-        artist: string;
-        reason: string;
-        confidence: number;
-    }[];
-    explanation: string;
 }
 
 export async function generateRecommendations(
@@ -143,23 +128,6 @@ export async function analyzeUserPreferences(input: string): Promise<{
             keywords: [],
         };
     }
-}
-
-export interface SmartSearchRequest {
-    query: string;
-    artists: Artist[];
-}
-
-export interface SmartSearchResult {
-    type: "artist" | "song" | "album" | "mood";
-    matches: any[];
-    interpretation: string;
-    filters: {
-        mood?: string;
-        genre?: string;
-        energy?: string;
-        year?: string;
-    };
 }
 
 export async function performSmartSearch(
@@ -314,23 +282,6 @@ Respond in JSON format:
         console.error("Mood recommendation error:", error);
         throw new Error("Failed to generate mood recommendations");
     }
-}
-
-export interface ArtistInsight {
-    musicalDNA: string;
-    careerHighlights: string[];
-    hiddenGems: string[];
-    influences: string[];
-    funFacts: string[];
-}
-
-export interface SongAnalysis {
-    sentiment: "positive" | "negative" | "neutral" | "mixed";
-    themes: string[];
-    musicalStyle: string;
-    lyricalMeaning?: string;
-    songStory: string;
-    emotionalImpact: string;
 }
 
 export async function generateArtistInsights(
@@ -533,4 +484,106 @@ export async function generateArtistComparison(
         console.error("Artist comparison error:", error);
         throw new Error("Failed to generate artist comparison");
     }
+}
+
+export async function processChatMessage(
+    userMessage: string,
+    context: ChatContext
+): Promise<ChatResponse> {
+    // Prepare conversation history for context
+    const recentMessages = context.messages.slice(-6);
+    const conversationHistory = recentMessages.map(msg =>
+        `${msg.role}: ${msg.content}`
+    ).join("\n");
+
+    const artistList = context.artistDatabase.map(artist =>
+        `${artist.name} (${artist.albums.length} albums)`
+    ).join(", ");
+
+    const prompt = `You are a knowledgeable music assistant for a music discovery app. You can help users explore music, provide recommendations, answer questions about artists, and engage in music-related conversations.
+    
+    AVAILABLE MUSIC DATABASE:
+    ${artistList}
+
+    CONVERSATION HISTORY:
+    ${conversationHistory}
+
+    CURRENT USER MESSAGE: "${userMessage}"
+
+    CAPABILITIES:
+    - Recommend artists from the available database
+    - Answer questions about specific artists, albums, or songs
+    - Provide music insights and trivia
+    - Help users discover new music based on their preferences
+    - Engage in casual music conversation
+
+    IMPORTANT RULES:
+    - Only recommend or discuss artists from the available database
+    - Be conversational and friendly
+    - If asked about artists not in the database, explain they're not available but suggest similar ones
+    - Provide 2-3 follow-up suggestions from the point of view of the user when appropriate
+    - Keep responses concise but informative
+
+    Respond in JSON format:
+    {
+        "message": "Your conversational response to the user",
+        "suggestions": ["Optional follow-up question 1", "Optional follow-up question 2"],
+        "relatedArtists": ["Artist1", "Artist2"] (if relevant),
+        "actionType": "recommendation|search|info|general"
+    }`;
+
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a friendly music assistant. Always respond with valid JSON only, no markdown. Be conversational and helpful."
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 600,
+        });
+
+        const response = completion.choices[0]?.message?.content;
+        if (!response) {
+            throw new Error("No response from OpenAI");
+        }
+
+        const cleanedResponse = cleanJsonResponse(response);
+        return JSON.parse(cleanedResponse);
+    } catch (error) {
+        console.error("Chat processing error:", error);
+
+        // Fallback response
+        return {
+            message: "I'm sorry, I'm having trouble processing your message right now. Could you try asking about one of our artists or ask for music recommendations?",
+            suggestions: ["What artists do you have?", "Recommend something upbeat", "Tell me about Ed Sheeran"],
+            actionType: "general"
+        };
+    }
+}
+
+export async function generateChatSuggestions(
+    context: ChatContext
+): Promise<string[]> {
+    const artistNames = context.artistDatabase.slice(0, 5).map(a => a.name);
+
+    const suggestions = [
+        "What artists do you have available?",
+        "Recommend something for working out",
+        "Tell me about your most popular artist",
+        `What do you know about ${artistNames[0]}`,
+        "I'm feeling nostalgic, what should I listen to?",
+        "Compare two artists for me",
+        "What's good for studying?",
+        "Show me something new"
+    ];
+
+    // Shuffle and return 4 random suggestions
+    return suggestions.sort(() => 0.5 - Math.random()).slice(0, 4);
 }

@@ -7,6 +7,7 @@ import HeroTitle from "@/src/components/HeroTitle";
 import AIRecommendations from "@/src/components/AIRecommendations";
 import MoodDiscovery from "@/src/components/MoodDiscovery";
 import ArtistComparison from "@/src/components/ArtistComparison";
+import MusicChatBot from "@/src/components/MusicChatBot";
 
 async function getArtists(): Promise<Artist[]> {
     try {
@@ -81,6 +82,9 @@ export default async function Homepage() {
                 </section>
             </div>
             <Footer />
+
+            {/* AI Chat Assistant - Available on all pages */}
+            <MusicChatBot />
         </>
     );
 }

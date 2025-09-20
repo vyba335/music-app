@@ -298,7 +298,7 @@ const AlbumCarousel: React.FC<AlbumCarouselProps> = ({
             if (opacity > 0.01) {
                 renderedAlbums.push(
                     <div
-                        key={`album-${normalizedAlbumIndex}`}
+                        key={`album-${normalizedAlbumIndex + i}`}
                         className="absolute cursor-pointer select-none flex flex-col items-center"
                         style={{
                             left: "50%",

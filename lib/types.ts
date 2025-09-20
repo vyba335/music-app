@@ -122,6 +122,73 @@ interface CreateAlbumInput {
     songs: CreateSongInput[];
 }
 
+export interface RecommendationRequest {
+    preferences: string;
+    mood?: string;
+    artists?: Artist[];
+}
+
+export interface RecommendationResponse {
+    recommendations: {
+        artist: string;
+        reason: string;
+        confidence: number;
+    }[];
+    explanation: string;
+}
+
+export interface SmartSearchRequest {
+    query: string;
+    artists: Artist[];
+}
+
+export interface SmartSearchResult {
+    type: "artist" | "song" | "album" | "mood";
+    matches: any[];
+    interpretation: string;
+    filters: {
+        mood?: string;
+        genre?: string;
+        energy?: string;
+        year?: string;
+    };
+}
+
+export interface ArtistInsight {
+    musicalDNA: string;
+    careerHighlights: string[];
+    hiddenGems: string[];
+    influences: string[];
+    funFacts: string[];
+}
+
+export interface SongAnalysis {
+    sentiment: "positive" | "negative" | "neutral" | "mixed";
+    themes: string[];
+    musicalStyle: string;
+    lyricalMeaning?: string;
+    songStory: string;
+    emotionalImpact: string;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+}
+
+export interface ChatContext {
+  messages: ChatMessage[];
+  artistDatabase: Artist[];
+}
+
+export interface ChatResponse {
+    message: string;
+    suggestions?: string[];
+    relatedArtists?: string[];
+    actionType?: "recommendation" | "search" | "info" | "general";
+}
+
 export type {
     Song,
     Album,

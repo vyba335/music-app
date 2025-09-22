@@ -6,7 +6,7 @@
 }
 
 .large-text {
-  font-size: 1.1em !important;
+  font-size: 150% !important;
 }
 .large-text * {
   font-size: inherit !important;

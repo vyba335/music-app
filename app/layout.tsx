@@ -22,7 +22,6 @@ export default function RootLayout({
                 <ErrorBoundary>
                     <ToastProvider>
                         {children}
-                        <AccessibilityFeatures />
                     </ToastProvider>
                 </ErrorBoundary>
             </body>

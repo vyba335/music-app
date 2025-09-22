@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { Music, Brain, Heart, MessageCircle, Loader2 } from "lucide-react";
+import { Brain, Loader2 } from "lucide-react";
 import type { Song } from "@/lib/types";
-import { getSession } from "next-auth/react";
 
 interface SongAnalysis {
     sentiment: "positive" | "negative" | "neutral" | "mixed";

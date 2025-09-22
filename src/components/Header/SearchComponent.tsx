@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useDeferredValue } from "react";
 import type {
     Song,
     ArtistOid,
@@ -18,7 +18,7 @@ import {
     Clock,
     Sparkles,
     Brain,
-    Check
+    BrainCircuit,
 } from "lucide-react";
 
 interface SearchComponentProps {
@@ -34,6 +34,7 @@ interface SmartSearchResult {
 
 const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     const [query, setQuery] = useState("");
+    const deferredQuery = useDeferredValue(query);
     const [results, setResults] = useState<SearchResult[]>([]);
     const [smartResults, setSmartResults] = useState<SmartSearchResult[]>([]);
     const [interpretation, setInterpretation] = useState("");
@@ -211,11 +212,11 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (useAI && query.length >= 5) {
-                performAISearch(query);
+            if (useAI && deferredQuery.length >= 5) {
+                performAISearch(deferredQuery);
                 setResults([]);
             } else {
-                const searchResults = performRegularSearch(query);
+                const searchResults = performRegularSearch(deferredQuery);
                 setResults(searchResults);
                 setSmartResults([]);
                 setInterpretation("");
@@ -224,7 +225,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
         }, 1200);
 
         return () => clearTimeout(timeoutId);
-    }, [query, useAI]);
+    }, [deferredQuery, useAI]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -292,11 +293,11 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
         let artist: ArtistResult | null = null;
         let album: AlbumResult | null = null;
         let song: SongResult | null = null;
-        
+
         for (const artistObj of artists) {
             // Check if it's an artist name match
             if (artistObj.name === result.name) {
-                artist = {type: "artist", artist: artistObj};
+                artist = { type: "artist", artist: artistObj };
                 break;
             }
 
@@ -304,7 +305,11 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             for (const albumObj of artistObj.albums) {
                 // Check if it's an album title match
                 if (albumObj.title === result.name) {
-                    album = { type: "album", artist: artistObj, album: albumObj };
+                    album = {
+                        type: "album",
+                        artist: artistObj,
+                        album: albumObj,
+                    };
                     break;
                 }
 
@@ -482,19 +487,29 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
 
     const renderSmartResult = (result: SmartSearchResult, index: number) => {
         const isSelected = index === selectedIndex;
-        const baseClasses = `px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 ${isSelected ? "bg-purple-50" : "hover:bg-purple-25"}`;
+        const baseClasses = `px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+            isSelected ? "bg-purple-50" : "hover:bg-purple-25"
+        }`;
 
         return (
-            <div key={`smart-${index}`} className={baseClasses} onClick={() => handleSmartResultClick(result)}>
+            <div
+                key={`smart-${index}`}
+                className={baseClasses}
+                onClick={() => handleSmartResultClick(result)}
+            >
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <Brain className="w-6 h-6 text-[#95c623]" />
                         <div>
-                            <span className="font-medium text-[#95c623] hover:text-white">{result.name}</span>
+                            <span className="font-medium text-[#95c623] hover:text-white">
+                                {result.name}
+                            </span>
                             <span className="ml-2 text-xs text-gray-400 px-2 border rounded">
                                 {result.type}
                             </span>
-                            <p className="text-sm text-gray-400 mt-1">{result.reason}</p>
+                            <p className="text-sm text-gray-400 mt-1">
+                                {result.reason}
+                            </p>
                         </div>
                     </div>
                     <span className="text-xs text-[#95c623] font-medium">
@@ -512,27 +527,35 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                 <input
                     ref={inputRef}
                     type="text"
-                    value={query}
+                    value={deferredQuery}
                     onChange={(e) => {
                         setQuery(e.target.value);
                         setIsOpen(true);
                     }}
                     onFocus={() => setIsOpen(true)}
-                    placeholder={useAI ? "Try: 'upbeat songs for working out'" : "Search artists, songs, albums, lyrics..."}
+                    placeholder={
+                        useAI
+                            ? "AI search: try 'upbeat songs for working out'"
+                            : "Regular search: search artists, songs, albums, lyrics..."
+                    }
                     className="w-full pl-10 pr-4 py-2 border border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent outline-none caret-[#95c623] text-white"
                     disabled={isLoading}
                     suppressHydrationWarning
                 />
-                <button 
+                <button
                     onClick={() => setUseAI(!useAI)}
-                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded ${useAI ? "text-[#5e7d16]" : "text-[#95c623]"} hover:bg-[#5e7d16] transition-colors`}
-                    title={useAI ? "Switch to regular search" : "Switch to AI search"}
-                    >
-                       {useAI ? (
-                        <Check className="w-6 h-6" />
-                       ) : (
+                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded text-[#95c623] hover:text-white transition-colors`}
+                    title={
+                        useAI
+                            ? "Switch to regular search"
+                            : "Switch to AI search"
+                    }
+                >
+                    {useAI ? (
+                        <BrainCircuit className="w-6 h-6" />
+                    ) : (
                         <Sparkles className="w-6 h-6" />
-                       )}
+                    )}
                 </button>
                 {isLoading && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -541,7 +564,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                 )}
             </div>
 
-            {isOpen && query.length >= 2 && (
+            {isOpen && deferredQuery.length >= 2 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
                     {useAI && interpretation && (
                         <div className="px-4 py-2 bg-[#272932] border-b border-purple-100 ">
@@ -555,23 +578,25 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                     {useAI ? (
                         smartResults.length > 0 ? (
                             <div>
-                                {smartResults.map((result, index) => renderSmartResult(result, index))}
+                                {smartResults.map((result, index) =>
+                                    renderSmartResult(result, index)
+                                )}
                             </div>
-                        ) : query.length >= 5 && !isLoading ? (
+                        ) : deferredQuery.length >= 5 && !isLoading ? (
                             <div className="px-4 py-3 text-gray-500 text-center text-sm">
-                                No AI results found for "{query}"
+                                No AI results found for "{deferredQuery}"
                             </div>
                         ) : null
+                    ) : results.length > 0 ? (
+                        <div>
+                            {results.map((result, index) =>
+                                renderResult(result, index)
+                            )}
+                        </div>
                     ) : (
-                        results.length > 0 ? (
-                            <div>
-                                {results.map((result, index) => renderResult(result, index))}
-                            </div>
-                        ) : (
-                            <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
-                                No results found for "{query}"
-                            </div>
-                        )
+                        <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
+                            No results found for "{deferredQuery}"
+                        </div>
                     )}
                 </div>
             )}

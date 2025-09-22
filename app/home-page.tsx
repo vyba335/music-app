@@ -16,11 +16,8 @@ async function getArtists(): Promise<Artist[]> {
         const artists = await db
             .collection("artists")
             .find({})
-            .limit(10)
+            .limit(12)
             .toArray();
-        const numberOfArtists = await db
-            .collection("artists")
-            .countDocuments();
         return JSON.parse(JSON.stringify(artists));
     } catch (e) {
         console.error(e);

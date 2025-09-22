@@ -79,7 +79,7 @@ const MoodDiscovery: React.FC = () => {
                         key={mood.name}
                         onClick={() => handleMoodSelect(mood.name)}
                         disabled={loading}
-                        className={`p-4 rounded-lg border-2 transition-all hover:shadow-md disabled:opacity-50 ${selectedMood === mood.name ? "border-purple-500 bg-purple-50" : "border-[#95c623] hover:border-gray-300"}`}
+                        className={`p-4 rounded-lg border-2 transition-all hover:shadow-md disabled:opacity-50 ${selectedMood === mood.name ? "border-purple-500 bg-purple-50" : "border-[#95c623] hover:border-gray-300"} cursor-pointer`}
                         >
                             <div className="flex flex-col items-center space-y-2">
                                 <div className={`p-2 rounded-full ${mood.color}`}>

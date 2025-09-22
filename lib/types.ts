@@ -189,6 +189,22 @@ export interface ChatResponse {
     actionType?: "recommendation" | "search" | "info" | "general";
 }
 
+export interface PlaylistTrack {
+    artist: string;
+    album: string;
+    song: string;
+    reason: string;
+    duration: string;
+}
+
+export interface GeneratedPlaylist {
+    name: string;
+    description: string;
+    tracks: PlaylistTrack[];
+    totalDuration: string;
+    theme: string;
+}
+
 export type {
     Song,
     Album,

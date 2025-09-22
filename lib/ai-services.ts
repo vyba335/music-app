@@ -1,5 +1,6 @@
 import { openai } from "./openai";
 import type { Artist, ChatContext, ChatResponse, ArtistInsight, SongAnalysis, SmartSearchRequest, SmartSearchResult, RecommendationRequest, RecommendationResponse } from "./types";
+import { cache } from "./cache";
 
 // Helper function to clean JSON responses from OpenAI
 function cleanJsonResponse(response: string): string {
@@ -287,6 +288,10 @@ Respond in JSON format:
 export async function generateArtistInsights(
     artist: Artist
 ): Promise<ArtistInsight> {
+    const cacheKey = `insights:${artist.name}`;
+    const cached = cache.get<ArtistInsight>(cacheKey);
+    if (cached) return cached;
+
     const albumInfo = artist.albums
         .map(
             (album) =>
@@ -343,7 +348,9 @@ export async function generateArtistInsights(
         }
 
         const cleanedResponse = cleanJsonResponse(response);
-        return JSON.parse(cleanedResponse);
+        const result = JSON.parse(cleanedResponse);
+        cache.set(cacheKey, result, 3600); // Cache 1 hour
+        return result;
     } catch (error) {
         console.error("Artist insights generation error:", error);
         throw new Error("Failed to generate artist insights");
@@ -586,4 +593,89 @@ export async function generateChatSuggestions(
 
     // Shuffle and return 4 random suggestions
     return suggestions.sort(() => 0.5 - Math.random()).slice(0, 4);
+}
+
+export async function generatePlaylist(
+    prompt: string,
+    artists: Artist[]
+): Promise<{
+    name: string;
+    description: string;
+    tracks: Array<{
+        artist: string;
+        album: string;
+        song: string;
+        reason: string;
+        duration: string;
+    }>;
+    totalDuration: string;
+    theme: string;
+}> {
+    const artistData = artists.map(a => ({
+        name: a.name,
+        albums: a.albums.map(album => ({
+            title: album.title,
+            year: album.released,
+            songs: album.songs.map(song => ({
+                title: song.title,
+                duration: song.length
+            }))
+        }))
+    })).slice(0, 50);
+    
+    const prompt_text = `You are a professional DJ and music curator. Create a cohesive playlist based on this request: "${prompt}"
+    
+    Available music database: ${JSON.stringify(artistData)}
+
+    Create a playlist with 8-15 tracks that flow well together. Consider:
+    - Musical progression and energy flow
+    - Thematic coherence
+    - Variety within the theme
+    - Actual songs from the database only
+
+    Respond in JSON format:
+    {
+        "name": "Creative playlist name",
+        "description": "Brief description of the playlist vibe",
+        "tracks": [
+            {
+                "artist": "Artist Name",
+                "album": "Album Name",
+                "song": "Song Title",
+                "reason": "Why this song fits the playlist",
+                "duration": "Song duration from database"
+            }
+        ],
+        "totalDuration": "Total playlist duration",
+        "theme": "One-word theme (e.g., 'Energetic', 'Chill', 'Nostalgic')"
+    }`;
+
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a professional music curator. Always respond with valid JSON. Only use songs from the provided database."
+                },
+                {
+                    role: "user",
+                    content: prompt_text
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+        });
+
+        const response = completion.choices[0]?.message?.content;
+        if (!response) {
+            throw new Error("No response from OpenAI");
+        }
+
+        const cleanedResponse = cleanJsonResponse(response);
+        return JSON.parse(cleanedResponse);
+    } catch (error) {
+        console.error("Playlist generation error:", error);
+        throw new Error("Failed to generate playlist");
+    }
 }

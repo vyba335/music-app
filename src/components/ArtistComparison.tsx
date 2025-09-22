@@ -95,7 +95,7 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                             title="Artist 1"
                             value={artist1}
                             onChange={(e) => setArtist1(e.target.value)}
-                            className="w-full p-2 border bg-gray-900 border-[#95c623] rounded focus:ring-2 focus:ring-[#95c623] focus:border-transparent"
+                            className="w-full p-2 border bg-gray-900 border-[#95c623] rounded focus:ring-2 focus:ring-[#95c623] focus:border-transparent cursor-pointer"
                             suppressHydrationWarning
                         >
                             <option value="">Select an artist...</option>
@@ -117,7 +117,7 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                             title="Artist 2"
                             value={artist2}
                             onChange={(e) => setArtist2(e.target.value)}
-                            className="w-full p-2 border bg-gray-900 border-[#95c623] rounded focus:ring-2 focus:ring-[#95c623] focus:border-transparent"
+                            className="w-full p-2 border bg-gray-900 border-[#95c623] rounded focus:ring-2 focus:ring-[#95c623] focus:border-transparent cursor-pointer"
                             suppressHydrationWarning
                         >
                             <option value="">Select an artist...</option>

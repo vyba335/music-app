@@ -7,6 +7,10 @@ import HeroTitle from "@/src/components/HeroTitle";
 import AIRecommendations from "@/src/components/AIRecommendations";
 import MoodDiscovery from "@/src/components/MoodDiscovery";
 import ArtistComparison from "@/src/components/ArtistComparison";
+import PlaylistGenerator from "@/src/components/PlaylistGenerator";
+import SmartDashboard from "@/src/components/SmartDashboard";
+import AdvancedSearch from "@/src/components/AdvancedSearch";
+import PerformanceMonitor from "@/src/components/PerformanceMonitor";
 import MusicChatBot from "@/src/components/MusicChatBot";
 
 async function getArtists(): Promise<Artist[]> {
@@ -53,20 +57,32 @@ export default async function Homepage() {
                     subtitle={`AI-powered music recommendations and mood-based discovery from our collection of ${numberOfArtists} artists.`}
                 />
 
-                {/* AI Recommendations Section */}
-                <section className="max-w-4xl mx-auto px-5 py-8">
-                    <AIRecommendations className="mb-8" />
+                {/* Smart Dashboard Section */}
+                <section className="max-w-6xl mx-auto px-5 py-8">
+                    <SmartDashboard />
                 </section>
 
-                {/* Mood Discovery Section */ }
-                <section className="max-w-4xl mx-auto px-5 pb-8">
-                    <MoodDiscovery />
+                {/* AI Features Grid */}
+                <section className="max-w-6xl mx-auto px-5 pb-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Left Colum */}
+                        <div className="space-y-8">
+                            <AIRecommendations />
+                            <MoodDiscovery />
+                        </div>
+
+                        {/* Right Column */}
+                        <div className="space-y-8">
+                            <PlaylistGenerator />
+                            <ArtistComparison availableArtists={artistNames} />
+                        </div>
+                    </div>
                 </section>
 
-                {/* Artist Comparison Section */}
-                <section className="max-w-4xl mx-auto px-5 pb-8">
-                    <ArtistComparison availableArtists={artistNames} />
-                </section>
+                {/* Advanced Search Section */}
+                {/* <section className="max-w-6xl mx-auto px-5 pb-8">
+                    <AdvancedSearch />
+                </section> */}
 
                 <HeroTitle
                     title="Featured Artists"
@@ -79,6 +95,7 @@ export default async function Homepage() {
                 </section>
             </div>
             <Footer />
+            <PerformanceMonitor />
 
             {/* AI Chat Assistant - Available on all pages */}
             <MusicChatBot />

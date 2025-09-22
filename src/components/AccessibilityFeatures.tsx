@@ -32,7 +32,7 @@ const AccessibilityFeatures: React.FC = () => {
     }, [highContrast, largeText, reducedMotion]);
 
     return (
-        <div className="fixed top-3 right-4 z-50">
+        <div className="fixed top-18 md:top-2 right-2 z-50">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors"

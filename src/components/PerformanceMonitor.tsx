@@ -46,7 +46,7 @@ const PerformanceMonitor: React.FC = () => {
     };
 
     return (
-        <div className="fixed bottom-16 left-4 bg-black/80 backdrop-blur-sm text-white p-4 rounded-lg text-xs border border-gray-700 max-w-sm">
+        <div className="hidden md:block fixed bottom-16 left-4 bg-black/80 backdrop-blur-sm text-white p-4 rounded-lg text-xs border border-gray-700 max-w-sm">
             <div className="flex items-center gap-2 mb-3">
                 <Activity className="w-4 h-4 text-[#95c623]" />
                 <span className="font-semibold">Performace Monitor</span>

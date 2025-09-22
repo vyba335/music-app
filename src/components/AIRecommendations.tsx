@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sparkles, Music, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AIComponentSkeleton, LoadingSpinner } from "./LoadingStates";
 
 interface Recommendation {
     artist: string;
@@ -19,7 +20,18 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
     const [explanation, setExplanation] = useState("");
     const [error, setError] = useState("");
+    const [initialLoading, setInitialLoading] = useState(true);
     const router = useRouter();
+
+    useEffect(() => {
+        // Simulate initial load
+        const timer = setTimeout(() => setInitialLoading(false), 500);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (initialLoading) {
+        return <AIComponentSkeleton />;
+    }
 
     const handleGetRecommendations = async () => {
         if (!preferences.trim()) {
@@ -89,6 +101,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
                         placeholder="E.g., 'I want something upbeat for working out' or 'relaxing acoustic music for studying'"
                         className="w-full p-3 border text-white caret-[#95c623] border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent resize-none"
                         rows={3}
+                        disabled={loading}
                         suppressHydrationWarning
                     />
                 </div>
@@ -100,7 +113,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
                     >
                         {loading ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <LoadingSpinner size="sm" color="text-white" />
                                 Getting recommendations...
                             </>
                         ) : (
@@ -123,7 +136,23 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ className = "" })
                         </div>
                     )}
 
-                    {recommendations.length > 0 && (
+                    {/* Results with loading */}
+                    {loading && (
+                        <div className="space-y-3">
+                        <div className="h-4 bg-gray-600 rounded w-1/3 animate-pulse"></div>
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="border border-gray-600 rounded-lg p-4 animate-pulse">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="h-4 bg-gray-600 rounded w-1/4"></div>
+                                    <div className="h-6 bg-gray-600 rounded w-16"></div>
+                                </div>
+                                <div className="h-3 bg-gray-600 rounded w-3/4"></div>
+                            </div>
+                        ))}
+                    </div>
+                    )}
+
+                    {recommendations.length > 0 && !loading && (
                         <div className="space-y-3">
                             <h3 className="font-medium text-white">Recommended Artists:</h3>
                             {recommendations.map((rec, index) => (

@@ -12,6 +12,11 @@ import SmartDashboard from "@/src/components/SmartDashboard";
 import AdvancedSearch from "@/src/components/AdvancedSearch";
 import PerformanceMonitor from "@/src/components/PerformanceMonitor";
 import MusicChatBot from "@/src/components/MusicChatBot";
+import {
+    ArtistCardSkeleton,
+    DashboardSkeleton,
+} from "@/src/components/LoadingStates";
+import { Suspense } from "react";
 
 async function getArtists(): Promise<Artist[]> {
     try {
@@ -33,9 +38,7 @@ async function getArtistCount(): Promise<number> {
     try {
         const client = await clientPromise;
         const db = client.db("musicapp");
-        const numberOfArtists = await db
-            .collection("artists")
-            .countDocuments();
+        const numberOfArtists = await db.collection("artists").countDocuments();
         return numberOfArtists;
     } catch (e) {
         console.error(e);
@@ -45,7 +48,7 @@ async function getArtistCount(): Promise<number> {
 
 export default async function Homepage() {
     const artists = await getArtists();
-    const artistNames = artists.map(artist => artist.name);
+    const artistNames = artists.map((artist) => artist.name);
     const numberOfArtists = await getArtistCount();
 
     return (
@@ -59,7 +62,9 @@ export default async function Homepage() {
 
                 {/* Smart Dashboard Section */}
                 <section className="max-w-6xl mx-auto px-5 py-8">
-                    <SmartDashboard />
+                    <Suspense fallback={<DashboardSkeleton />}>
+                        <SmartDashboard />
+                    </Suspense>
                 </section>
 
                 {/* AI Features Grid */}

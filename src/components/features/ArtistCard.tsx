@@ -7,6 +7,7 @@ import type { Artist } from "@/lib/types";
 import { Card, Button, Badge } from '@/src/components/ui';
 import { useMusicContext } from '@/src/contexts/MusicContext';
 import { useIntersectionObserver } from '@/src/hooks/useIntersectionObserver';
+import { artistNameToSlug } from '@/src/utils/urlUtils';
 
 interface ArtistCardProps {
     artist: Artist;
@@ -35,14 +36,14 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
     const songCount = artist.albums?.reduce((total, album) => total + album.songs.length, 0) || 0;
 
     const handleArtistClick = () => {
-        const artistSlug = artist.name.toLowerCase().replace(/\s+/g, "-");
+        const artistSlug = artistNameToSlug(artist.name);
         setCurrentArtist(artist);
         router.push(`/artist/${artistSlug}`);
     };
 
     const handleAlbumClick = (albumIndex: number, event: React.MouseEvent) => {
         event.stopPropagation();
-        const artistSlug = artist.name.toLowerCase().replace(/\s+/g, "-");
+        const artistSlug = artistNameToSlug(artist.name)
         setCurrentArtist(artist);
         router.push(`/artist/${artistSlug}?album=${albumIndex}`);
     };

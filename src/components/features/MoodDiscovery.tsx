@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Heart, Zap, Moon, Sun, Music2, Loader2, TreePalm } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { artistNameToSlug } from "@/src/utils/urlUtils";
 
 interface MoodRecommendation {
     artist: string;
@@ -96,7 +97,7 @@ const MoodDiscovery: React.FC = () => {
     };
 
     const handleArtistClick = (artistName: string) => {
-        const artistSlug = artistName.toLowerCase().replace(/\s+/g, "-");
+        const artistSlug = artistNameToSlug(artistName);
         router.push(`/artist/${artistSlug}`);
     };
 

@@ -12,10 +12,10 @@ import { useIntersectionObserver } from '@/src/hooks/useIntersectionObserver';
 
 interface ArtistClientProps {
     artist: Artist;
-    artistName: string;
+    artistSlug: string;
 }
 
-const ArtistClient: React.FC<ArtistClientProps> = ({ artist, artistName }) => {
+const ArtistClient: React.FC<ArtistClientProps> = ({ artist, artistSlug }) => {
     const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
     const [selectedSong, setSelectedSong] = useState<Song | null>(null);
     const [showInsights, setShowInsights] = useState(false);
@@ -99,10 +99,10 @@ const ArtistClient: React.FC<ArtistClientProps> = ({ artist, artistName }) => {
         setSelectedAlbum(album);
         setSelectedSong(null);
         
-        // Update URL
+        // Update URL using the original slug
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set("album", index.toString());
-        router.replace(`/artist/${artistName}?${newSearchParams.toString()}`);
+        router.replace(`/artist/${artistSlug}?${newSearchParams.toString()}`);
     };
 
     const closeAlbumView = () => {
@@ -126,7 +126,7 @@ const ArtistClient: React.FC<ArtistClientProps> = ({ artist, artistName }) => {
         } else {
             newSearchParams.delete("insights");
         }
-        router.replace(`/artist/${artistName}?${newSearchParams.toString()}`);
+        router.replace(`/artist/${artistSlug}?${newSearchParams.toString()}`);
     };
 
     const handleFavoriteToggle = () => {

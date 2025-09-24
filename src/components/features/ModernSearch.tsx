@@ -20,6 +20,7 @@ import { useMusicContext } from '@/src/contexts/MusicContext';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import { useClickOutside } from '@/src/hooks/useClickOutside';
 import { useKeyboardShortcuts } from '@/src/hooks/useKeyboardShortcuts';
+import { artistNameToSlug } from "@/src/utils/urlUtils";
 
 interface ModernSearchProps {
   className?: string;
@@ -197,7 +198,7 @@ export const ModernSearch: React.FC<ModernSearchProps> = ({ className = "" }) =>
     // Handle regular search results
     if ('artist' in result) {
       setCurrentArtist(result.artist);
-      const slug = result.artist.name.toLowerCase().replace(/\s+/g, "-");
+      const slug = artistNameToSlug(result.artist.name);
       
       switch (result.type) {
         case 'artist':

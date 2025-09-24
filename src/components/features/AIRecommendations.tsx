@@ -6,6 +6,7 @@ import { Card, Button, Input, Badge } from '@/src/components/ui';
 import { AIComponentSkeleton, LoadingSpinner, ErrorState } from '@/src/components/ui/LoadingStates';
 import { useMusicContext } from '@/src/contexts/MusicContext';
 import { useDebounce } from '@/src/hooks/useDebounce';
+import { artistNameToSlug } from "@/src/utils/urlUtils";
 
 interface Recommendation {
     artist: string;
@@ -89,7 +90,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
 
     const handleArtistClick = async (artistName: string) => {
         try {
-            const artistSlug = artistName.toLowerCase().replace(/\s+/g, "-");
+            const artistSlug = artistNameToSlug(artistName);
 
             const response = await fetch("/api/artists");
             if (response.ok) {

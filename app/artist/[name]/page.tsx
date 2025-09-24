@@ -4,6 +4,7 @@ import Footer from "@/src/components/features/Footer";
 import ArtistClient from "./ArtistClient";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { slugToArtistName } from "@/src/utils/urlUtils";
 
 interface PageProps {
     params: Promise<{
@@ -11,17 +12,13 @@ interface PageProps {
     }>;
 }
 
-async function getArtistData(name: string): Promise<Artist | null> {
+async function getArtistData(slug: string): Promise<Artist | null> {
     try {
-        if (!name || typeof name !== "string") {
+        if (!slug || typeof slug !== "string") {
             return null;
         }
 
-        const artistName = name
-            .replace(/-/g, " ")
-            .split(" ")
-            .map((word) => word[0]?.toUpperCase() + word.slice(1).toLowerCase())
-            .join(" ");
+        const artistName = slugToArtistName(slug);
 
         const { default: dataByName } = await import("@/lib/dataHelper");
 
@@ -50,7 +47,7 @@ export default async function ArtistPage({ params }: PageProps) {
             <Header />
             <main>
                 <Suspense fallback={<div>Loading artist...</div>}>
-                    <ArtistClient artist={artist} artistName={resolvedParams.name} />
+                    <ArtistClient artist={artist} artistSlug={resolvedParams.name} />
                 </Suspense>
             </main>
             <Footer />

@@ -14,7 +14,8 @@
     "next-auth": "^5.0.0-beta.29",
     "openai": "^5.21.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-window": "^2.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",

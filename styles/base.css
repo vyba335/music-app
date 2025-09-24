@@ -86,16 +86,17 @@ html {
 }
 .custom-header,
 .custom-footer {
-    background-color: #272932;
+    background: var(--gradient-dark);
 }
 .login-button {
-    background-color: #5e7d16;
-    color: #ffffff;
-    font-size: 0.95rem;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-lg);
 }
 .login-button:hover {
-    background-color: #95c623;
-    color: #ffffff;
+    background: var(--gradient-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
 }
 .logo {
     transition: transform 0.5s;
@@ -105,16 +106,17 @@ html {
 }
 .search-element input:hover,
 .search-element input:focus {
-    border-color: #95c623;
-    caret-color: #95c623;
+    border-color: var(--primary-500);
+    caret-color: var(--primary-500);
 }
 .search-element input,
 .search-element button:hover {
-    color: #95c623;
+    color: var(--primary-500);
 }
+/* NEW */
 .copyright-block {
-    border-color: #95c623;
+    border-color: var(--primary-500);
 }
 textarea:focus-visible {
-    outline: none;   
+    outline: none;
 }

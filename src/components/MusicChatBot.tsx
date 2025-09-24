@@ -1,6 +1,14 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { MessageCircle, Send, X, Loader2, Music, Sparkles, Trash2 } from "lucide-react";
+import {
+    MessageCircle,
+    Send,
+    X,
+    Loader2,
+    Music,
+    Sparkles,
+    Trash2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ChatMessage } from "@/lib/types";
 
@@ -261,7 +269,11 @@ const MusicChatBot: React.FC = () => {
             {/* Chat Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`fixed bottom-4 right-4 z-50 border-2 ${isOpen ? "bg-purple-600 border-transparent" : "bg-purple-600 border-[#95c623]"}  text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 ${
+                className={`fixed bottom-4 right-4 z-50 border-2 ${
+                    isOpen
+                        ? "bg-purple-600 border-transparent"
+                        : "bg-purple-600 border-[var(--primary-500)]"
+                }  text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 ${
                     hasHistory && !isOpen
                         ? "ring-2 ring-purple-300 ring-opacity-50"
                         : ""
@@ -281,9 +293,9 @@ const MusicChatBot: React.FC = () => {
 
             {/* Chat Interface */}
             {isOpen && (
-                <div className="fixed bottom-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-[500px] bg-[#272932] rounded-lg shadow-2xl border border-[#95c623] z-40 flex flex-col">
+                <div className="fixed bottom-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-[500px] bg-[var(--surface-dark)] rounded-lg shadow-2xl border border-[var(--primary-500)] z-40 flex flex-col">
                     {/* Header */}
-                    <div className="bg-[#95c623] text-white p-4 rounded-t-lg flex items-center gap-2">
+                    <div className="bg-[var(--primary-500)] text-white p-4 rounded-t-lg flex items-center gap-2">
                         <Sparkles className="w-5 h-5" />
                         <h3 className="font-semibold">Music Assistant</h3>
                         <div className="ml-auto flex items-center gap-2">
@@ -366,7 +378,7 @@ const MusicChatBot: React.FC = () => {
 
                     {/* Suggestions */}
                     {suggestions.length > 0 && !loading && (
-                        <div className="px-4 py-2 border-t border-[#95c623]">
+                        <div className="px-4 py-2 border-t border-[var(--primary-500)]">
                             <div className="text-xs text-gray-300 mb-2">
                                 Suggested questions:
                             </div>
@@ -391,7 +403,7 @@ const MusicChatBot: React.FC = () => {
                     )}
 
                     {/* Input Area */}
-                    <div className="p-4 border-t border-[#95c623]">
+                    <div className="p-4 border-t border-[var(--primary-500)]">
                         <div className="flex gap-2">
                             <input
                                 ref={inputRef}
@@ -402,13 +414,13 @@ const MusicChatBot: React.FC = () => {
                                 }
                                 onKeyPress={handleKeyPress}
                                 placeholder="Ask about music, artists, or get recommendations..."
-                                className="flex-1 p-2 border border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent focus-visible:outline-0 text-sm caret-[#95c623]"
+                                className="flex-1 p-2 border border-[var(--primary-500)] rounded-lg focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent focus-visible:outline-0 text-sm caret-[var(--primary-500)]"
                                 disabled={loading}
                             />
                             <button
                                 onClick={() => sendMessage()}
                                 disabled={loading || !inputMessage.trim()}
-                                className="bg-[#95c623] text-white p-2 rounded-lg hover:bg-purple-700 disabled:opacity-70 disabled:cursor-not-allowed transition-colors"
+                                className="bg-[var(--primary-500)] text-white p-2 rounded-lg hover:bg-purple-700 disabled:opacity-70 disabled:cursor-not-allowed transition-colors"
                             >
                                 <Send className="w-4 h-4" />
                             </button>

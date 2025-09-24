@@ -22,7 +22,7 @@ const PerformanceMonitor: React.FC = () => {
                 cacheHitRate: Math.random() * 40 + 60,
                 activeConnections: Math.floor(Math.random() * 50) + 10,
                 memoryUsage: Math.random() * 30 + 40,
-                lastUpdated: new Date().toLocaleTimeString()
+                lastUpdated: new Date().toLocaleTimeString(),
             });
         };
 
@@ -39,7 +39,10 @@ const PerformanceMonitor: React.FC = () => {
 
     if (!isVisible || !metrics) return null;
 
-    const getHealthColor = (value: number, thresholds: { good: number, warning: number}) => {
+    const getHealthColor = (
+        value: number,
+        thresholds: { good: number; warning: number }
+    ) => {
         if (value <= thresholds.good) return "text-green-500";
         if (value <= thresholds.warning) return "text-yellow-500";
         return "text-red-500";
@@ -48,7 +51,7 @@ const PerformanceMonitor: React.FC = () => {
     return (
         <div className="hidden md:block fixed bottom-16 left-4 bg-black/80 backdrop-blur-sm text-white p-4 rounded-lg text-xs border border-gray-700 max-w-sm">
             <div className="flex items-center gap-2 mb-3">
-                <Activity className="w-4 h-4 text-[#95c623]" />
+                <Activity className="w-4 h-4 text-[var(--primary-500)]" />
                 <span className="font-semibold">Performace Monitor</span>
             </div>
 
@@ -58,7 +61,12 @@ const PerformanceMonitor: React.FC = () => {
                         <Clock className="w-3 h-3" />
                         API Response
                     </span>
-                    <span className={getHealthColor(metrics.apiResponseTime, { good: 150, warning: 250 })}>
+                    <span
+                        className={getHealthColor(metrics.apiResponseTime, {
+                            good: 150,
+                            warning: 250,
+                        })}
+                    >
                         {metrics.apiResponseTime.toFixed(0)}ms
                     </span>
                 </div>
@@ -68,7 +76,12 @@ const PerformanceMonitor: React.FC = () => {
                         <Database className="w-3 h-3" />
                         Cache Hit Rate
                     </span>
-                    <span className={getHealthColor(100 - metrics.cacheHitRate, { good: 20, warning: 40 })}>
+                    <span
+                        className={getHealthColor(100 - metrics.cacheHitRate, {
+                            good: 20,
+                            warning: 40,
+                        })}
+                    >
                         {metrics.cacheHitRate.toFixed(1)}%
                     </span>
                 </div>
@@ -78,7 +91,9 @@ const PerformanceMonitor: React.FC = () => {
                         <Wifi className="w-3 h-3" />
                         Connections
                     </span>
-                    <span className="text-blue-400">{metrics.activeConnections}</span>
+                    <span className="text-blue-400">
+                        {metrics.activeConnections}
+                    </span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -86,7 +101,12 @@ const PerformanceMonitor: React.FC = () => {
                         <Cpu className="w-3 h-3" />
                         Memory
                     </span>
-                    <span className={getHealthColor(metrics.memoryUsage, { good: 50, warning: 75 })}>
+                    <span
+                        className={getHealthColor(metrics.memoryUsage, {
+                            good: 50,
+                            warning: 75,
+                        })}
+                    >
                         {metrics.memoryUsage.toFixed(1)}%
                     </span>
                 </div>

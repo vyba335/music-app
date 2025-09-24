@@ -3,7 +3,7 @@ import "@/styles/base.css";
 import "@/styles/embla.css";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
 import { ToastProvider } from "@/src/components/ToastNotifications";
-import AccessibilityFeatures from "@/src/components/AccessibilityFeatures";
+import { MusicProvider } from "@/src/contexts";
 
 export const metadata = {
     title: "AI Music Discovery App",
@@ -17,12 +17,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
+        <html lang="en" data-theme="dark">
             <body>
                 <ErrorBoundary>
-                    <ToastProvider>
-                        {children}
-                    </ToastProvider>
+                    <MusicProvider>
+                        <ToastProvider>{children}</ToastProvider>
+                    </MusicProvider>
                 </ErrorBoundary>
             </body>
         </html>

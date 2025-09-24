@@ -1,10 +1,10 @@
 import clientPromise from "@/lib/mongodb";
 import type { Artist } from "@/lib/types";
-import ArtistCard from "@/src/components/ArtistCard";
+import { ArtistCard } from "@/src/components/features/ArtistCard";
 import Header from "@/src/components/Header/Header";
 import Footer from "@/src/components/Footer";
 import HeroTitle from "@/src/components/HeroTitle";
-import AIRecommendations from "@/src/components/AIRecommendations";
+import AIRecommendations from "@/src/components/features/AIRecommendations";
 import MoodDiscovery from "@/src/components/MoodDiscovery";
 import ArtistComparison from "@/src/components/ArtistComparison";
 import PlaylistGenerator from "@/src/components/PlaylistGenerator";

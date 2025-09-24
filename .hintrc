@@ -8,7 +8,8 @@
       {
         "ignore": [
           "user-select",
-          "-webkit-text-size-adjust"
+          "-webkit-text-size-adjust",
+          "backdrop-filter"
         ]
       }
     ],
@@ -18,6 +19,13 @@
         "button-name": "off"
       }
     ],
-    "no-inline-styles": "off"
+    "no-inline-styles": "off",
+    "css-prefix-order": "off",
+    "axe/aria": [
+      "default",
+      {
+        "aria-valid-attr-value": "off"
+      }
+    ]
   }
 }

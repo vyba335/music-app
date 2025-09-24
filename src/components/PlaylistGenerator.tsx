@@ -199,7 +199,10 @@ const PlaylistGenerator: React.FC = () => {
         const text = encodeURIComponent(
             `🎵 Just generated this amazing playlist: "${
                 playlist?.name
-            }" - ${playlist?.description.substring(0, 80)}... #AIMusic #Playlist`
+            }" - ${playlist?.description.substring(
+                0,
+                80
+            )}... #AIMusic #Playlist`
         );
 
         window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
@@ -216,9 +219,9 @@ const PlaylistGenerator: React.FC = () => {
     ];
 
     return (
-        <div className="bg-[#272932] rounded-lg shadow-lg p-6">
+        <div className="bg-[var(--surface-dark)] rounded-lg shadow-lg p-6">
             <div className="flex items-center gap-2 mb-6">
-                <PlayCircle className="w-6 h-6 text-[#95c623]" />
+                <PlayCircle className="w-6 h-6 text-[var(--primary-500)]" />
                 <h2 className="text-2xl font-bold text-white">
                     AI Playlist Generator
                 </h2>
@@ -234,7 +237,7 @@ const PlaylistGenerator: React.FC = () => {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="E.g., 'Create a workout playlist with high-energy electronic music and motivational lyrics'"
-                        className="w-full p-3 border border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent resize-none text-white bg-gray-800 caret-[#95c623]"
+                        className="w-full p-3 border border-[var(--primary-500)] rounded-lg focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent resize-none text-white bg-gray-800 caret-[var(--primary-500)]"
                         rows={3}
                         suppressHydrationWarning
                     />
@@ -250,7 +253,7 @@ const PlaylistGenerator: React.FC = () => {
                             <button
                                 key={index}
                                 onClick={() => setPrompt(preset)}
-                                className="text-left p-2 text-sm border border-gray-600 rounded hover:border-[#95c623] text-gray-300 hover:text-white transition-colors cursor-pointer"
+                                className="text-left p-2 text-sm border border-gray-600 rounded hover:border-[var(--primary-500)] text-gray-300 hover:text-white transition-colors cursor-pointer"
                             >
                                 {preset}
                             </button>
@@ -262,7 +265,7 @@ const PlaylistGenerator: React.FC = () => {
                 <button
                     onClick={generatePlaylist}
                     disabled={loading || !prompt.trim()}
-                    className="w-full bg-[#95c623] text-white px-4 py-3 rounded-lg hover:bg-[#5e7d16] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors font-medium"
+                    className="w-full bg-[var(--primary-500)] text-white px-4 py-3 rounded-lg hover:bg-[var(--primary-700)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors font-medium"
                 >
                     {loading ? (
                         <>
@@ -286,7 +289,7 @@ const PlaylistGenerator: React.FC = () => {
                 {playlist && (
                     <div className="mt-8 space-y-6">
                         {/* Playlist Header */}
-                        <div className="bg-gradient-to-r from-[#95c623] to-[#5e7d16] rounded-lg p-6 text-white">
+                        <div className="bg-gradient-to-r from-[var(--primary-500)] to-[var(--primary-700)] rounded-lg p-6 text-white">
                             <div className="flex flex-col md:flex-row items-center justify-between">
                                 <div>
                                     <h3 className="text-2xl font-bold mb-2">
@@ -344,7 +347,7 @@ const PlaylistGenerator: React.FC = () => {
                                             {index + 1}
                                         </div>
                                         <div>
-                                            <h5 className="font-medium text-white group-hover:text-[#95c623] transition-colors">
+                                            <h5 className="font-medium text-white group-hover:text-[var(--primary-500)] transition-colors">
                                                 {track.song}
                                             </h5>
                                             <p className="text-sm text-gray-300">
@@ -387,7 +390,7 @@ const PlaylistGenerator: React.FC = () => {
                                 onClick={copyToClipboard}
                                 className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
                             >
-                                <Copy className="w-5 h-5 text-[#95c623]" />
+                                <Copy className="w-5 h-5 text-[var(--primary-500)]" />
                                 <div>
                                     <div className="font-medium text-gray-900">
                                         Copy to Clipboard

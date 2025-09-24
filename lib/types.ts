@@ -54,25 +54,25 @@ interface Artist {
 
 interface ArtistResult {
     type: "artist";
-    artist: ArtistOid;
+    artist: Artist;
 }
 
 interface SongResult {
     type: "song";
-    artist: ArtistOid;
+    artist: Artist;
     album: Album;
     song: Song;
 }
 
 interface AlbumResult {
     type: "album";
-    artist: ArtistOid;
+    artist: Artist;
     album: Album;
 }
 
 interface LyricsResult {
     type: "lyrics";
-    artist: ArtistOid;
+    artist: Artist;
     album: Album;
     song: Song;
     matchedText: string;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useDeferredValue } from "react";
 import type {
     Song,
-    ArtistOid,
+    Artist,
     ArtistResult,
     SongResult,
     AlbumResult,
@@ -40,7 +40,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     const [interpretation, setInterpretation] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
-    const [artists, setArtists] = useState<ArtistOid[]>([]);
+    const [artists, setArtists] = useState<Artist[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [useAI, setUseAI] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
@@ -355,7 +355,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             case "artist":
                 return (
                     <div
-                        key={`artist-${result.artist._id.$oid}`}
+                        key={`artist-${result.artist._id}`}
                         className={baseClasses}
                         onClick={() => handleSelect(result)}
                     >
@@ -386,7 +386,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             case "song":
                 return (
                     <div
-                        key={`song-${result.artist._id.$oid}-${result.album.title}-${result.song.title}`}
+                        key={`song-${result.artist._id}-${result.album.title}-${result.song.title}`}
                         className={baseClasses}
                         onClick={() => handleSelect(result)}
                     >
@@ -418,7 +418,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                 const firstThreeSongs = result.album.songs.slice(0, 3);
                 return (
                     <div
-                        key={`album-${result.artist._id.$oid}-${result.album.title}`}
+                        key={`album-${result.artist._id}-${result.album.title}`}
                         className={baseClasses}
                         onClick={() => handleSelect(result)}
                     >
@@ -456,7 +456,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             case "lyrics":
                 return (
                     <div
-                        key={`lyrics-${result.artist._id.$oid}-${result.album.title}-${result.song.title}`}
+                        key={`lyrics-${result.artist._id}-${result.album.title}-${result.song.title}`}
                         className={baseClasses}
                         onClick={() => handleSelect(result)}
                     >
@@ -499,9 +499,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             >
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <Brain className="w-6 h-6 text-[#95c623]" />
+                        <Brain className="w-6 h-6 text-[var(--primary-500)]" />
                         <div>
-                            <span className="font-medium text-[#95c623] hover:text-white">
+                            <span className="font-medium text-[var(--primary-500)] hover:text-white">
                                 {result.name}
                             </span>
                             <span className="ml-2 text-xs text-gray-400 px-2 border rounded">
@@ -512,7 +512,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                             </p>
                         </div>
                     </div>
-                    <span className="text-xs text-[#95c623] font-medium">
+                    <span className="text-xs text-[var(--primary-500)] font-medium">
                         {result.confidence}% match
                     </span>
                 </div>
@@ -523,7 +523,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
     return (
         <div ref={searchRef} className="flex-1 relative w-full max-w-3xl">
             <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#95c623] w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--primary-500)] w-5 h-5" />
                 <input
                     ref={inputRef}
                     type="text"
@@ -538,13 +538,13 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
                             ? "AI search: try 'upbeat songs for working out'"
                             : "Regular search: search artists, songs, albums, lyrics..."
                     }
-                    className="w-full pl-10 pr-4 py-2 border border-[#95c623] rounded-lg focus:ring-2 focus:ring-[#95c623] focus:border-transparent outline-none caret-[#95c623] text-white"
+                    className="w-full pl-10 pr-4 py-2 border border-[var(--primary-500)] rounded-lg focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent outline-none caret-[var(--primary-500)] text-white"
                     disabled={isLoading}
                     suppressHydrationWarning
                 />
                 <button
                     onClick={() => setUseAI(!useAI)}
-                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded text-[#95c623] hover:text-white transition-colors`}
+                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded text-[var(--primary-500)] hover:text-white transition-colors`}
                     title={
                         useAI
                             ? "Switch to regular search"
@@ -567,7 +567,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onSelect }) => {
             {isOpen && deferredQuery.length >= 2 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
                     {useAI && interpretation && (
-                        <div className="px-4 py-2 bg-[#272932] border-b border-purple-100 ">
+                        <div className="px-4 py-2 bg-[var(--surface-dark)] border-b border-purple-100 ">
                             <p className="text-sm text-gray-300">
                                 <Sparkles className="w-3 h-3 inline mr-1" />
                                 AI understands: {interpretation}

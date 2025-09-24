@@ -1,6 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { GitCompare, Loader2, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import {
+    GitCompare,
+    Loader2,
+    TrendingUp,
+    TrendingDown,
+    ArrowRight,
+} from "lucide-react";
 
 interface ComparisonResult {
     compatibility: number;
@@ -17,7 +23,7 @@ interface ArtistComparisonProps {
 
 const ArtistComparison: React.FC<ArtistComparisonProps> = ({
     availableArtists,
-    className = ""
+    className = "",
 }) => {
     const [artist1, setArtist1] = useState("");
     const [artist2, setArtist2] = useState("");
@@ -56,7 +62,9 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
             const data = await response.json();
             setComparison(data.comparison);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to compare artists");
+            setError(
+                err instanceof Error ? err.message : "Failed to compare artists"
+            );
             console.error(err);
         } finally {
             setLoading(false);
@@ -76,7 +84,9 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
     };
 
     return (
-        <div className={`bg-[#272932] rounded-lg shadow-lg p-6 ${className}`}>
+        <div
+            className={`bg-[var(--surface-dark)] rounded-lg shadow-lg p-6 ${className}`}
+        >
             <div className="flex items-center gap-2 mb-6">
                 <GitCompare className="w-5 h-5 text-blue-500" />
                 <h2 className="text-xl font-semibold text-gray-100">
@@ -95,12 +105,14 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                             title="Artist 1"
                             value={artist1}
                             onChange={(e) => setArtist1(e.target.value)}
-                            className="w-full p-2 border bg-gray-900 border-[#95c623] rounded focus:ring-2 focus:ring-[#95c623] focus:border-transparent cursor-pointer"
+                            className="w-full p-2 border bg-gray-900 border-[var(--primary-500)] rounded focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent cursor-pointer"
                             suppressHydrationWarning
                         >
                             <option value="">Select an artist...</option>
-                            {availableArtists.map(artist => (
-                                <option key={artist} value={artist}>{artist}</option>
+                            {availableArtists.map((artist) => (
+                                <option key={artist} value={artist}>
+                                    {artist}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -117,13 +129,17 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                             title="Artist 2"
                             value={artist2}
                             onChange={(e) => setArtist2(e.target.value)}
-                            className="w-full p-2 border bg-gray-900 border-[#95c623] rounded focus:ring-2 focus:ring-[#95c623] focus:border-transparent cursor-pointer"
+                            className="w-full p-2 border bg-gray-900 border-[var(--primary-500)] rounded focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent cursor-pointer"
                             suppressHydrationWarning
                         >
                             <option value="">Select an artist...</option>
-                            {availableArtists.filter(artist => artist !== artist1).map(artist => (
-                                <option key={artist} value={artist}>{artist}</option>
-                            ))}
+                            {availableArtists
+                                .filter((artist) => artist !== artist1)
+                                .map((artist) => (
+                                    <option key={artist} value={artist}>
+                                        {artist}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                 </div>
@@ -131,7 +147,7 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                 <button
                     onClick={handleCompare}
                     disabled={loading || !artist1 || !artist2}
-                    className="w-full bg-[#95c623] text-white px-4 py-2 rounded-lg hover:bg-[#5e7d16] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                    className="w-full bg-[var(--primary-500)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-700)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
                 >
                     {loading ? (
                         <>
@@ -156,7 +172,11 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                     <div className="space-y-6 mt-6">
                         {/* Compatibility Score */}
                         <div className="text-center">
-                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${getCompatibilityColor(comparison.compatibility)}`}>
+                            <div
+                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${getCompatibilityColor(
+                                    comparison.compatibility
+                                )}`}
+                            >
                                 {getCompatibilityIcon(comparison.compatibility)}
                                 <span className="font-semibold">
                                     {comparison.compatibility}% Compatible
@@ -166,8 +186,12 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
 
                         {/* Analysis */}
                         <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <h3 className="font-semibold text-blue-900 mb-2">AI Analysis</h3>
-                            <p className="text-blue-800 text-sm">{comparison.analysis}</p>
+                            <h3 className="font-semibold text-blue-900 mb-2">
+                                AI Analysis
+                            </h3>
+                            <p className="text-blue-800 text-sm">
+                                {comparison.analysis}
+                            </p>
                         </div>
 
                         {/* Similarities */}
@@ -177,12 +201,21 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                                 Similarities
                             </h3>
                             <ul className="space-y-2">
-                                {comparison.similarities.map((similarity, index) => (
-                                    <li key={index} className="flex items-start gap-2">
-                                        <span className="text-green-500 text-sm mt-1">•</span>
-                                        <span className="text-gray-300 text-sm">{similarity}</span>
-                                    </li>
-                                ))}
+                                {comparison.similarities.map(
+                                    (similarity, index) => (
+                                        <li
+                                            key={index}
+                                            className="flex items-start gap-2"
+                                        >
+                                            <span className="text-green-500 text-sm mt-1">
+                                                •
+                                            </span>
+                                            <span className="text-gray-300 text-sm">
+                                                {similarity}
+                                            </span>
+                                        </li>
+                                    )
+                                )}
                             </ul>
                         </div>
 
@@ -193,12 +226,21 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                                 Key Differences
                             </h3>
                             <ul className="space-y-2">
-                                {comparison.differences.map((difference, index) => (
-                                    <li key={index} className="flex items-start gap-2">
-                                        <span className="text-red-500 text-sm mt-1">•</span>
-                                        <span className="text-gray-300 text-sm">{difference}</span>
-                                    </li>
-                                ))}
+                                {comparison.differences.map(
+                                    (difference, index) => (
+                                        <li
+                                            key={index}
+                                            className="flex items-start gap-2"
+                                        >
+                                            <span className="text-red-500 text-sm mt-1">
+                                                •
+                                            </span>
+                                            <span className="text-gray-300 text-sm">
+                                                {difference}
+                                            </span>
+                                        </li>
+                                    )
+                                )}
                             </ul>
                         </div>
 
@@ -208,7 +250,9 @@ const ArtistComparison: React.FC<ArtistComparisonProps> = ({
                                 <ArrowRight className="w-4 h-4" />
                                 Recommendation
                             </h3>
-                            <p className="text-purple-800 text-sm">{comparison.recommendation}</p>
+                            <p className="text-purple-800 text-sm">
+                                {comparison.recommendation}
+                            </p>
                         </div>
                     </div>
                 )}

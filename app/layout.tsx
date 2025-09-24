@@ -1,8 +1,8 @@
 import "@/styles/globals.css";
 import "@/styles/base.css";
 import "@/styles/embla.css";
-import ErrorBoundary from "@/src/components/ErrorBoundary";
-import { ToastProvider } from "@/src/components/ToastNotifications";
+import ErrorBoundary from "@/src/components/features/ErrorBoundary";
+import { ToastProvider } from "@/src/components/features/ToastNotifications";
 import { MusicProvider } from "@/src/contexts";
 
 export const metadata = {

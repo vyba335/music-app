@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from 'next/image';
 import type { Artist, Album, Song } from "@/lib/types";
 import { Card, Button, Badge } from '@/src/components/ui';
-import ArtistInsights from "@/src/components/ArtistInsights";
-import MusicChatBot from "@/src/components/MusicChatBot";
+import ArtistInsights from "@/src/components/features/ArtistInsights";
+import MusicChatBot from "@/src/components/features/MusicChatBot";
 import { useMusicContext } from '@/src/contexts/MusicContext';
 import { useIntersectionObserver } from '@/src/hooks/useIntersectionObserver';
 

@@ -1,7 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import musicAppIconGreen from "../../lib/img/musicappicongreen.png";
-import "../../styles/base.css";
+import musicAppIconGreen from "@/lib/img/musicappicongreen.png";
 import AccessibilityFeatures from "./AccessibilityFeatures";
 
 interface Footer {}

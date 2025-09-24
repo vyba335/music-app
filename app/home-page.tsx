@@ -1,21 +1,21 @@
 import clientPromise from "@/lib/mongodb";
 import type { Artist } from "@/lib/types";
 import { ArtistCard } from "@/src/components/features/ArtistCard";
-import Header from "@/src/components/Header/Header";
-import Footer from "@/src/components/Footer";
-import HeroTitle from "@/src/components/HeroTitle";
+import Header from "@/src/components/features/Header/Header";
+import Footer from "@/src/components/features/Footer";
+import HeroTitle from "@/src/components/features/HeroTitle";
 import AIRecommendations from "@/src/components/features/AIRecommendations";
-import MoodDiscovery from "@/src/components/MoodDiscovery";
-import ArtistComparison from "@/src/components/ArtistComparison";
-import PlaylistGenerator from "@/src/components/PlaylistGenerator";
-import SmartDashboard from "@/src/components/SmartDashboard";
-import AdvancedSearch from "@/src/components/AdvancedSearch";
-import PerformanceMonitor from "@/src/components/PerformanceMonitor";
-import MusicChatBot from "@/src/components/MusicChatBot";
+import MoodDiscovery from "@/src/components/features/MoodDiscovery";
+import ArtistComparison from "@/src/components/features/ArtistComparison";
+import PlaylistGenerator from "@/src/components/features/PlaylistGenerator";
+import SmartDashboard from "@/src/components/features/SmartDashboard";
+import AdvancedSearch from "@/src/components/features/AdvancedSearch";
+import PerformanceMonitor from "@/src/components/features/PerformanceMonitor";
+import MusicChatBot from "@/src/components/features/MusicChatBot";
 import {
     ArtistCardSkeleton,
     DashboardSkeleton,
-} from "@/src/components/LoadingStates";
+} from "@/src/components/features/LoadingStates";
 import { Suspense } from "react";
 
 async function getArtists(): Promise<Artist[]> {

@@ -1,6 +1,6 @@
 import type { Artist } from "@/lib/types";
-import Header from "@/src/components/Header/Header";
-import Footer from "@/src/components/Footer";
+import Header from "@/src/components/features/Header/Header";
+import Footer from "@/src/components/features/Footer";
 import ArtistClient from "./ArtistClient";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";

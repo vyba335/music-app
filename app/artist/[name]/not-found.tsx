@@ -1,7 +1,7 @@
 "use client";
 
-import Header from "@/src/components/Header/Header";
-import Footer from "@/src/components/Footer";
+import Header from "@/src/components/features/Header/Header";
+import Footer from "@/src/components/features/Footer";
 import { useRouter } from "next/navigation";
 
 export default function ArtistNotFound() {
